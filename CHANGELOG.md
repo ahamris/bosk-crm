@@ -4,6 +4,25 @@ All notable changes to BOSK CRM will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] - 2026-04-01
+
+### Added
+- **Moneybird Integration** — native API integration for invoicing & accounting
+  - Modular integration system (add-on marketplace: Moneybird, Mollie, Google Calendar, Mailchimp)
+  - MoneybirdClient: contacts, products, sales invoices, payments, tax rates
+  - MoneybirdSync: auto-sync contacts & services, create invoices from appointments
+  - Settings UI: API token config, test connection, sync buttons
+- **Invoices** — full invoice management
+  - Create invoices with line items, auto-generate from completed appointments
+  - Send to Moneybird, mark as paid, status tracking (draft/open/paid/late)
+  - Invoices page with table, status badges, actions
+- **AI Assistant** — AI-powered features page
+  - Smart Scheduling (Beta) with interactive chat interface
+  - Client Insights, Auto Notes, Revenue Forecast cards (Coming Soon)
+- **Realistic Seed Data** — 10 beauty/skin services (Laser, Cryolipolyse, Velashape, Microneedling, Hydrafacial, Chemical Peel, etc.), 10 Dutch clients, 15 appointments, 10 client notes
+- Sidebar: Invoices, Integrations, AI Assistant nav items
+- 64 API routes total (was 51)
+
 ## [0.3.0] - 2026-04-01
 
 ### Added
