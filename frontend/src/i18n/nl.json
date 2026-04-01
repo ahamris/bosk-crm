@@ -9,6 +9,7 @@
     "invoices": "Facturen",
     "integrations": "Integraties",
     "employees": "Medewerkers",
+    "reviews": "Beoordelingen",
     "ai": "AI Assistent",
     "logout": "Uitloggen"
   },
@@ -261,6 +262,23 @@
     "ask_placeholder": "Vraag over je planning...",
     "coming_soon": "Binnenkort beschikbaar",
     "beta": "Beta"
+  },
+  "reviews": {
+    "title": "Beoordelingen",
+    "published": "Gepubliceerd",
+    "unpublished": "Niet gepubliceerd",
+    "all": "Alle",
+    "toggle_publish": "Publicatie wisselen",
+    "no_reviews": "Nog geen beoordelingen",
+    "average": "Gemiddeld",
+    "stars": "sterren"
+  },
+  "notifications": {
+    "title": "Meldingen",
+    "mark_all_read": "Alles als gelezen markeren",
+    "no_notifications": "Geen meldingen",
+    "new_booking": "Nieuwe boeking",
+    "new_review": "Nieuwe beoordeling"
   },
   "common": {
     "save": "Opslaan",

@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\ServiceCategoryController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\InvoiceController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\WorkingHourController;
 use Illuminate\Support\Facades\Route;
@@ -97,6 +98,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('locations/{location}/invoices/{invoice}/send', [InvoiceController::class, 'send']);
     Route::post('locations/{location}/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid']);
     Route::post('locations/{location}/appointments/{appointment}/invoice', [InvoiceController::class, 'fromAppointment']);
+
+    // Notifications
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::patch('notifications/{notification}/read', [NotificationController::class, 'markRead']);
+    Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
 
     // Reviews
     Route::get('locations/{location}/reviews', [ReviewController::class, 'index']);

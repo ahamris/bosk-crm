@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\ClientNote;
 use App\Models\EmployeeProfile;
 use App\Models\Location;
+use App\Models\Notification;
 use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
@@ -277,6 +278,80 @@ class DatabaseSeeder extends Seeder
                 'comment' => $rev['comment'],
                 'is_published' => $rev['is_published'],
             ]);
+        }
+
+        // ── Notifications ──────────────────────────────────────
+        $notifications = [
+            [
+                'type' => 'new_booking',
+                'title' => 'Nieuwe boeking van Maria Bakker',
+                'message' => 'Laser Ontharing op maandag om 09:00',
+                'data' => ['client_id' => $clientModels[0]->id, 'appointment_id' => 1],
+                'read_at' => null,
+                'created_at' => now()->subHours(1),
+            ],
+            [
+                'type' => 'new_booking',
+                'title' => 'Nieuwe boeking van Anna de Jong',
+                'message' => 'Hydrafacial op maandag om 11:00',
+                'data' => ['client_id' => $clientModels[1]->id, 'appointment_id' => 2],
+                'read_at' => null,
+                'created_at' => now()->subHours(2),
+            ],
+            [
+                'type' => 'new_review',
+                'title' => 'Nieuwe beoordeling van Fatima El Amrani',
+                'message' => '5 sterren — "Na drie sessies microneedling zie ik echt verschil."',
+                'data' => ['client_id' => $clientModels[2]->id, 'review_id' => 3],
+                'read_at' => null,
+                'created_at' => now()->subHours(4),
+            ],
+            [
+                'type' => 'appointment_reminder',
+                'title' => 'Afspraakherinnering: Sophie van den Berg',
+                'message' => 'Velashape Behandeling morgen om 10:00',
+                'data' => ['client_id' => $clientModels[5]->id, 'appointment_id' => 7],
+                'read_at' => null,
+                'created_at' => now()->subHours(6),
+            ],
+            [
+                'type' => 'new_review',
+                'title' => 'Nieuwe beoordeling van Svetlana Ivanova',
+                'message' => '4 sterren — "Отличный массаж, очень расслабляющий."',
+                'data' => ['client_id' => $clientModels[4]->id, 'review_id' => 9],
+                'read_at' => now()->subHours(5),
+                'created_at' => now()->subHours(12),
+            ],
+            [
+                'type' => 'new_booking',
+                'title' => 'Nieuwe boeking van Emma de Groot',
+                'message' => 'Lichaamsmassage op dinsdag om 14:00',
+                'data' => ['client_id' => $clientModels[6]->id, 'appointment_id' => 4],
+                'read_at' => now()->subHours(10),
+                'created_at' => now()->subDay(),
+            ],
+            [
+                'type' => 'appointment_reminder',
+                'title' => 'Afspraakherinnering: Anna Jansen',
+                'message' => 'Acne Behandeling woensdag om 13:00',
+                'data' => ['client_id' => $clientModels[7]->id, 'appointment_id' => 6],
+                'read_at' => now()->subHours(20),
+                'created_at' => now()->subDays(2),
+            ],
+            [
+                'type' => 'new_booking',
+                'title' => 'Nieuwe boeking van Nadia Youssef',
+                'message' => 'Lichaamspeeling op vrijdag om 14:00',
+                'data' => ['client_id' => $clientModels[9]->id, 'appointment_id' => 10],
+                'read_at' => now()->subDay(),
+                'created_at' => now()->subDays(3),
+            ],
+        ];
+
+        foreach ($notifications as $notif) {
+            Notification::create(array_merge($notif, [
+                'user_id' => $admin->id,
+            ]));
         }
     }
 }

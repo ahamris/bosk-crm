@@ -256,6 +256,18 @@ export interface InvoiceLine {
   total_cents: number;
 }
 
+export interface AppNotification {
+  id: number;
+  user_id: number;
+  type: 'new_booking' | 'new_review' | 'appointment_reminder' | 'appointment_cancelled';
+  title: string;
+  message: string | null;
+  data: Record<string, unknown> | null;
+  read_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;

@@ -9,6 +9,7 @@
     "invoices": "Invoices",
     "integrations": "Integrations",
     "employees": "Employees",
+    "reviews": "Reviews",
     "ai": "AI Assistant",
     "logout": "Logout"
   },
@@ -261,6 +262,23 @@
     "ask_placeholder": "Ask about your schedule...",
     "coming_soon": "Coming soon",
     "beta": "Beta"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "published": "Published",
+    "unpublished": "Unpublished",
+    "all": "All",
+    "toggle_publish": "Toggle publish",
+    "no_reviews": "No reviews yet",
+    "average": "Average",
+    "stars": "stars"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "no_notifications": "No notifications",
+    "new_booking": "New booking",
+    "new_review": "New review"
   },
   "common": {
     "save": "Save",

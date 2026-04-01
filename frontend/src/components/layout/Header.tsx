@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, MapPin } from 'lucide-react';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
+import { NotificationBell } from './NotificationBell';
 import { useAuthStore } from '../../stores/authStore';
 import { useLocationStore } from '../../stores/locationStore';
 import { useLocations } from '../../hooks/useApi';
@@ -45,6 +46,7 @@ export function Header() {
           </div>
         )}
         <LanguageSwitcher />
+        <NotificationBell />
         <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5">
           <User className="h-4 w-4 text-slate-500" />
           <span className="text-sm font-medium text-slate-700">{user?.name ?? ''}</span>

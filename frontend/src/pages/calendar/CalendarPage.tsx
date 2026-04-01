@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   format,
@@ -13,6 +13,16 @@ import {
 } from 'date-fns';
 import { nl, enUS, ru } from 'date-fns/locale';
 import type { Locale } from 'date-fns/locale';
+import {
+  DndContext,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import {
   ChevronLeft,
   ChevronRight,
@@ -44,6 +54,7 @@ import {
   useClients,
   useServices,
   useCreateAppointment,
+  useUpdateAppointment,
   useTransitionAppointment,
   useCreateInvoiceFromAppointment,
 } from '../../hooks/useApi';
@@ -118,6 +129,63 @@ const appointmentSchema = z.object({
 type AppointmentForm = z.infer<typeof appointmentSchema>;
 
 // ---------------------------------------------------------------------------
+// Drag-and-drop helper components (week view only)
+// ---------------------------------------------------------------------------
+
+function DraggableAppointment({
+  apt,
+  children,
+}: {
+  apt: Appointment;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `apt-${apt.id}`,
+    data: { appointment: apt },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={{
+        opacity: isDragging ? 0.3 : 1,
+        cursor: isDragging ? 'grabbing' : 'grab',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function DroppableSlot({
+  dayIso,
+  hour,
+  children,
+}: {
+  dayIso: string;
+  hour: number;
+  children: React.ReactNode;
+}) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `slot-${dayIso}-${hour}`,
+    data: { dayIso, hour },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`min-h-[60px] border-l border-slate-100 p-1 cursor-pointer transition-colors ${
+        isOver ? 'bg-teal-50 ring-1 ring-teal-300 ring-inset' : 'hover:bg-slate-50'
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -149,7 +217,63 @@ export function CalendarPage() {
   const { data: services = [] } = useServices();
   const createAppointment = useCreateAppointment();
   const transitionAppointment = useTransitionAppointment();
+  const updateAppointment = useUpdateAppointment();
   const createInvoice = useCreateInvoiceFromAppointment();
+
+  // Drag-and-drop state (week view only)
+  const [draggedAppointment, setDraggedAppointment] = useState<Appointment | null>(null);
+  const [dropSuccess, setDropSuccess] = useState<number | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const apt = event.active.data.current?.appointment as Appointment | undefined;
+    if (apt) setDraggedAppointment(apt);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      setDraggedAppointment(null);
+      const { active, over } = event;
+      if (!over) return;
+
+      const apt = active.data.current?.appointment as Appointment | undefined;
+      const slotData = over.data.current as { dayIso?: string; hour?: number } | undefined;
+      if (!apt || !slotData?.dayIso || slotData.hour == null) return;
+
+      // Calculate duration of original appointment
+      const originalStart = parseISO(apt.starts_at);
+      const originalEnd = parseISO(apt.ends_at);
+      const durationMs = originalEnd.getTime() - originalStart.getTime();
+
+      // Build new start/end
+      const newStart = setMinutes(setHours(parseISO(slotData.dayIso), slotData.hour), 0);
+      const newEnd = new Date(newStart.getTime() + durationMs);
+
+      // Skip if same slot
+      if (
+        originalStart.getHours() === slotData.hour &&
+        format(originalStart, 'yyyy-MM-dd') === slotData.dayIso
+      ) {
+        return;
+      }
+
+      try {
+        await updateAppointment.mutateAsync({
+          id: apt.id,
+          starts_at: newStart.toISOString(),
+          ends_at: newEnd.toISOString(),
+        });
+        setDropSuccess(apt.id);
+        setTimeout(() => setDropSuccess(null), 1200);
+      } catch {
+        // mutation error handled by react-query
+      }
+    },
+    [updateAppointment],
+  );
 
   const clients = clientsData?.data ?? [];
 
@@ -340,71 +464,101 @@ export function CalendarPage() {
           <LoadingSpinner size="lg" />
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <div className="min-w-[800px]">
-            {/* Header row */}
-            <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-slate-200">
-              <div className="p-2" />
-              {weekDays.map((day) => (
-                <div
-                  key={day.toISOString()}
-                  className={`p-2 text-center border-l border-slate-200 ${
-                    isSameDay(day, new Date()) ? 'bg-primary-50' : ''
-                  }`}
-                >
-                  <p className="text-xs text-slate-500 uppercase">
-                    {format(day, 'EEE', { locale })}
-                  </p>
-                  <p
-                    className={`text-lg font-semibold ${
-                      isSameDay(day, new Date()) ? 'text-primary-700' : 'text-slate-900'
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <div className="overflow-x-auto">
+            <div className="min-w-[800px]">
+              {/* Header row */}
+              <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-slate-200">
+                <div className="p-2" />
+                {weekDays.map((day) => (
+                  <div
+                    key={day.toISOString()}
+                    className={`p-2 text-center border-l border-slate-200 ${
+                      isSameDay(day, new Date()) ? 'bg-primary-50' : ''
                     }`}
                   >
-                    {format(day, 'd')}
-                  </p>
+                    <p className="text-xs text-slate-500 uppercase">
+                      {format(day, 'EEE', { locale })}
+                    </p>
+                    <p
+                      className={`text-lg font-semibold ${
+                        isSameDay(day, new Date()) ? 'text-primary-700' : 'text-slate-900'
+                      }`}
+                    >
+                      {format(day, 'd')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Time grid */}
+              {HOURS.map((hour) => (
+                <div
+                  key={hour}
+                  className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-slate-100"
+                >
+                  <div className="p-2 text-right text-xs text-slate-400 pr-3">
+                    {String(hour).padStart(2, '0')}:00
+                  </div>
+                  {weekDays.map((day) => {
+                    const dayIso = format(day, 'yyyy-MM-dd');
+                    const slotApts = getAppointmentsForSlot(day, hour);
+                    return (
+                      <DroppableSlot
+                        key={`${day.toISOString()}-${hour}`}
+                        dayIso={dayIso}
+                        hour={hour}
+                      >
+                        <div onClick={() => handleSlotClick(day, hour)} className="min-h-[48px]">
+                          {slotApts.map((apt) => (
+                            <DraggableAppointment key={apt.id} apt={apt}>
+                              <div
+                                className={`mb-1 rounded-md border px-2 py-1 text-xs cursor-pointer transition-all ${STATUS_COLORS[apt.status]} ${
+                                  dropSuccess === apt.id
+                                    ? 'ring-2 ring-teal-400 bg-teal-50'
+                                    : ''
+                                }`}
+                                onClick={(e) => openDetail(apt, e)}
+                              >
+                                <p className="font-medium truncate">{clientDisplayName(apt)}</p>
+                                <p className="truncate opacity-80">
+                                  {apt.service ? localizedName(apt.service, i18n.language) : ''}
+                                </p>
+                                <p className="opacity-70">
+                                  {format(parseISO(apt.starts_at), 'HH:mm')}
+                                </p>
+                              </div>
+                            </DraggableAppointment>
+                          ))}
+                        </div>
+                      </DroppableSlot>
+                    );
+                  })}
                 </div>
               ))}
             </div>
-
-            {/* Time grid */}
-            {HOURS.map((hour) => (
-              <div
-                key={hour}
-                className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-slate-100"
-              >
-                <div className="p-2 text-right text-xs text-slate-400 pr-3">
-                  {String(hour).padStart(2, '0')}:00
-                </div>
-                {weekDays.map((day) => {
-                  const slotApts = getAppointmentsForSlot(day, hour);
-                  return (
-                    <div
-                      key={`${day.toISOString()}-${hour}`}
-                      onClick={() => handleSlotClick(day, hour)}
-                      className="min-h-[60px] border-l border-slate-100 p-1 cursor-pointer hover:bg-slate-50 transition-colors"
-                    >
-                      {slotApts.map((apt) => (
-                        <div
-                          key={apt.id}
-                          className={`mb-1 rounded-md border px-2 py-1 text-xs cursor-pointer transition-colors ${STATUS_COLORS[apt.status]}`}
-                          onClick={(e) => openDetail(apt, e)}
-                        >
-                          <p className="font-medium truncate">{clientDisplayName(apt)}</p>
-                          <p className="truncate opacity-80">
-                            {apt.service ? localizedName(apt.service, i18n.language) : ''}
-                          </p>
-                          <p className="opacity-70">
-                            {format(parseISO(apt.starts_at), 'HH:mm')}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
           </div>
-        </div>
+
+          {/* Ghost element while dragging */}
+          <DragOverlay>
+            {draggedAppointment ? (
+              <div
+                className={`rounded-md border px-2 py-1 text-xs shadow-lg opacity-90 ${STATUS_COLORS[draggedAppointment.status]}`}
+                style={{ width: 140 }}
+              >
+                <p className="font-medium truncate">{clientDisplayName(draggedAppointment)}</p>
+                <p className="truncate opacity-80">
+                  {draggedAppointment.service
+                    ? localizedName(draggedAppointment.service, i18n.language)
+                    : ''}
+                </p>
+                <p className="opacity-70">
+                  {format(parseISO(draggedAppointment.starts_at), 'HH:mm')}
+                </p>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       )}
     </>
   );

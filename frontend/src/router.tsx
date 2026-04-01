@@ -27,6 +27,7 @@ import { EmployeeCreatePage } from './pages/employees/EmployeeCreatePage';
 import { EmployeeDetailPage } from './pages/employees/EmployeeDetailPage';
 import { EmployeeEditPage } from './pages/employees/EmployeeEditPage';
 import { AiAssistantPage } from './pages/ai/AiAssistantPage';
+import { ReviewListPage } from './pages/reviews/ReviewListPage';
 import { BookingPage } from './pages/booking/BookingPage';
 import { useAuthStore } from './stores/authStore';
 
@@ -155,6 +156,12 @@ const employeeEditRoute = createRoute({
   component: EmployeeEditPage,
 });
 
+const reviewsRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/reviews',
+  component: ReviewListPage,
+});
+
 const settingsRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/settings',
@@ -205,6 +212,7 @@ const routeTree = rootRoute.addChildren([
     employeeCreateRoute,
     employeeDetailRoute,
     employeeEditRoute,
+    reviewsRoute,
     settingsRoute,
     integrationsRoute,
     invoicesRoute,

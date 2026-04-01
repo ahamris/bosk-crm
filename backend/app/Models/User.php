@@ -68,6 +68,11 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'employee_user_id');
     }
 
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

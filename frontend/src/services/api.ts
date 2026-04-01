@@ -11,6 +11,7 @@ import type {
   Employee,
   WorkingHour,
   Review,
+  AppNotification,
   DashboardResponse,
   PaginatedResponse,
   LoginCredentials,
@@ -306,6 +307,41 @@ export async function sendInvoice(locationId: number, invoiceId: number) {
 export async function markInvoicePaid(locationId: number, invoiceId: number) {
   const { data } = await api.post(`/locations/${locationId}/invoices/${invoiceId}/mark-paid`);
   return data;
+}
+
+// Reviews (location-scoped)
+export async function getReviews(locationId: number): Promise<Review[]> {
+  const { data } = await api.get(`/locations/${locationId}/reviews`);
+  return data.data ?? data;
+}
+
+export async function toggleReviewPublish(locationId: number, reviewId: number): Promise<Review> {
+  const { data } = await api.patch(`/locations/${locationId}/reviews/${reviewId}/toggle-publish`);
+  return data.data ?? data;
+}
+
+export async function deleteReview(locationId: number, reviewId: number): Promise<void> {
+  await api.delete(`/locations/${locationId}/reviews/${reviewId}`);
+}
+
+// Notifications
+export async function getNotifications(): Promise<PaginatedResponse<AppNotification>> {
+  const { data } = await api.get('/notifications');
+  return data;
+}
+
+export async function getUnreadCount(): Promise<{ count: number }> {
+  const { data } = await api.get('/notifications/unread-count');
+  return data;
+}
+
+export async function markNotificationRead(id: number): Promise<AppNotification> {
+  const { data } = await api.patch(`/notifications/${id}/read`);
+  return data.data ?? data;
+}
+
+export async function markAllNotificationsRead(): Promise<void> {
+  await api.post('/notifications/mark-all-read');
 }
 
 export default api;

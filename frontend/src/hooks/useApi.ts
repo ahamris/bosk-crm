@@ -408,3 +408,71 @@ export function useUpdateLocation() {
     },
   });
 }
+
+// Reviews (location-scoped)
+export function useReviews() {
+  const locationId = useActiveLocationId();
+  return useQuery({
+    queryKey: ['reviews', locationId],
+    queryFn: () => api.getReviews(locationId!),
+    enabled: !!locationId,
+  });
+}
+
+export function useToggleReviewPublish() {
+  const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
+  return useMutation({
+    mutationFn: (reviewId: number) => api.toggleReviewPublish(locationId!, reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
+}
+
+export function useDeleteReview() {
+  const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
+  return useMutation({
+    mutationFn: (reviewId: number) => api.deleteReview(locationId!, reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
+}
+
+// Notifications
+export function useNotifications() {
+  return useQuery({
+    queryKey: ['notifications'],
+    queryFn: api.getNotifications,
+  });
+}
+
+export function useUnreadCount() {
+  return useQuery({
+    queryKey: ['notifications', 'unread-count'],
+    queryFn: api.getUnreadCount,
+    refetchInterval: 30000,
+  });
+}
+
+export function useMarkNotificationRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.markNotificationRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+}
+
+export function useMarkAllRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.markAllNotificationsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+}

@@ -9,6 +9,7 @@
     "invoices": "Счета",
     "integrations": "Интеграции",
     "employees": "Сотрудники",
+    "reviews": "Отзывы",
     "ai": "AI Ассистент",
     "logout": "Выйти"
   },
@@ -261,6 +262,23 @@
     "ask_placeholder": "Спросите о расписании...",
     "coming_soon": "Скоро доступно",
     "beta": "Beta"
+  },
+  "reviews": {
+    "title": "Отзывы",
+    "published": "Опубликовано",
+    "unpublished": "Не опубликовано",
+    "all": "Все",
+    "toggle_publish": "Переключить",
+    "no_reviews": "Отзывов пока нет",
+    "average": "Среднее",
+    "stars": "звёзд"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "mark_all_read": "Отметить все как прочитанные",
+    "no_notifications": "Нет уведомлений",
+    "new_booking": "Новая запись",
+    "new_review": "Новый отзыв"
   },
   "common": {
     "save": "Сохранить",
