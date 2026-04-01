@@ -6,6 +6,9 @@
     "clients": "Klanten",
     "services": "Diensten",
     "settings": "Instellingen",
+    "invoices": "Facturen",
+    "integrations": "Integraties",
+    "ai": "AI Assistent",
     "logout": "Uitloggen"
   },
   "auth": {
@@ -140,6 +143,42 @@
       "saturday": "Zaterdag",
       "sunday": "Zondag"
     }
+  },
+  "integrations": {
+    "title": "Integraties",
+    "configured": "Geconfigureerd",
+    "not_configured": "Niet geconfigureerd",
+    "coming_soon": "Binnenkort",
+    "test_connection": "Verbinding testen",
+    "connection_success": "Verbinding succesvol!",
+    "save_activate": "Opslaan & activeren",
+    "sync_contacts": "Contacten synchroniseren",
+    "sync_services": "Diensten synchroniseren",
+    "api_token": "API Token",
+    "administration_id": "Administratie ID"
+  },
+  "invoices": {
+    "title": "Facturen",
+    "create": "Factuur aanmaken",
+    "send": "Naar Moneybird",
+    "mark_paid": "Betaald markeren",
+    "from_appointment": "Factuur aanmaken",
+    "status": {
+      "draft": "Concept",
+      "open": "Open",
+      "paid": "Betaald",
+      "late": "Te laat"
+    }
+  },
+  "ai": {
+    "title": "AI Assistent",
+    "smart_scheduling": "Slimme Planning",
+    "client_insights": "Klant Inzichten",
+    "auto_notes": "Auto Notities",
+    "revenue_forecast": "Omzet Voorspelling",
+    "ask_placeholder": "Vraag over je planning...",
+    "coming_soon": "Binnenkort beschikbaar",
+    "beta": "Beta"
   },
   "common": {
     "save": "Opslaan",

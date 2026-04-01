@@ -6,6 +6,9 @@
     "clients": "Clients",
     "services": "Services",
     "settings": "Settings",
+    "invoices": "Invoices",
+    "integrations": "Integrations",
+    "ai": "AI Assistant",
     "logout": "Logout"
   },
   "auth": {
@@ -140,6 +143,42 @@
       "saturday": "Saturday",
       "sunday": "Sunday"
     }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "configured": "Configured",
+    "not_configured": "Not configured",
+    "coming_soon": "Coming soon",
+    "test_connection": "Test connection",
+    "connection_success": "Connection successful!",
+    "save_activate": "Save & activate",
+    "sync_contacts": "Sync contacts",
+    "sync_services": "Sync services",
+    "api_token": "API Token",
+    "administration_id": "Administration ID"
+  },
+  "invoices": {
+    "title": "Invoices",
+    "create": "Create invoice",
+    "send": "Send to Moneybird",
+    "mark_paid": "Mark as paid",
+    "from_appointment": "Create invoice",
+    "status": {
+      "draft": "Draft",
+      "open": "Open",
+      "paid": "Paid",
+      "late": "Late"
+    }
+  },
+  "ai": {
+    "title": "AI Assistant",
+    "smart_scheduling": "Smart Scheduling",
+    "client_insights": "Client Insights",
+    "auto_notes": "Auto Notes",
+    "revenue_forecast": "Revenue Forecast",
+    "ask_placeholder": "Ask about your schedule...",
+    "coming_soon": "Coming soon",
+    "beta": "Beta"
   },
   "common": {
     "save": "Save",

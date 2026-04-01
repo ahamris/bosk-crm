@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Appointment;
 use App\Models\Client;
+use App\Models\ClientNote;
 use App\Models\EmployeeProfile;
 use App\Models\Location;
 use App\Models\Service;
@@ -65,16 +66,21 @@ class DatabaseSeeder extends Seeder
 
         // ── Services ───────────────────────────────────────────
         $services = [
-            ['category' => 'huidbehandelingen', 'name_nl' => 'Microdermabrasie', 'name_en' => 'Microdermabrasion', 'duration_minutes' => 45, 'price_cents' => 7500, 'color' => '#ef4444'],
-            ['category' => 'huidbehandelingen', 'name_nl' => 'Chemische Peeling', 'name_en' => 'Chemical Peel', 'duration_minutes' => 30, 'price_cents' => 6500, 'color' => '#f97316'],
-            ['category' => 'gezichtsbehandeling', 'name_nl' => 'Klassieke Gezichtsbehandeling', 'name_en' => 'Classic Facial', 'duration_minutes' => 60, 'price_cents' => 8500, 'color' => '#8b5cf6'],
-            ['category' => 'gezichtsbehandeling', 'name_nl' => 'Anti-Age Behandeling', 'name_en' => 'Anti-Age Treatment', 'duration_minutes' => 75, 'price_cents' => 12000, 'color' => '#a855f7'],
-            ['category' => 'gezichtsbehandeling', 'name_nl' => 'Hydrafacial', 'name_en' => 'Hydrafacial', 'duration_minutes' => 50, 'price_cents' => 11000, 'color' => '#6366f1'],
-            ['category' => 'lichaam', 'name_nl' => 'Lichaamsmassage 60 min', 'name_en' => 'Body Massage 60 min', 'duration_minutes' => 60, 'price_cents' => 7000, 'color' => '#22c55e'],
-            ['category' => 'lichaam', 'name_nl' => 'Lichaamsscrub', 'name_en' => 'Body Scrub', 'duration_minutes' => 45, 'price_cents' => 5500, 'color' => '#14b8a6'],
-            ['category' => 'nagels', 'name_nl' => 'Manicure', 'name_en' => 'Manicure', 'duration_minutes' => 30, 'price_cents' => 3500, 'color' => '#ec4899'],
-            ['category' => 'nagels', 'name_nl' => 'Pedicure', 'name_en' => 'Pedicure', 'duration_minutes' => 45, 'price_cents' => 4500, 'color' => '#f43f5e'],
-            ['category' => 'overig', 'name_nl' => 'Wimper Extensions', 'name_en' => 'Lash Extensions', 'duration_minutes' => 90, 'price_cents' => 9500, 'color' => '#0ea5e9'],
+            // Huidbehandelingen (Skin Treatments)
+            ['category' => 'huidbehandelingen', 'name_nl' => 'Laser Ontharing', 'name_en' => 'Laser Hair Removal', 'name_ru' => 'Лазерная эпиляция', 'duration_minutes' => 30, 'buffer_minutes' => 10, 'price_cents' => 8900, 'color' => '#ef4444'],
+            ['category' => 'huidbehandelingen', 'name_nl' => 'Cryolipolyse', 'name_en' => 'Cryolipolysis', 'name_ru' => 'Криолиполиз', 'duration_minutes' => 60, 'buffer_minutes' => 15, 'price_cents' => 24900, 'color' => '#3b82f6'],
+            ['category' => 'huidbehandelingen', 'name_nl' => 'Velashape Behandeling', 'name_en' => 'Velashape Treatment', 'name_ru' => 'Велашейп процедура', 'duration_minutes' => 45, 'buffer_minutes' => 10, 'price_cents' => 14900, 'color' => '#f97316'],
+            ['category' => 'huidbehandelingen', 'name_nl' => 'Microneedling', 'name_en' => 'Microneedling', 'name_ru' => 'Микронидлинг', 'duration_minutes' => 45, 'buffer_minutes' => 15, 'price_cents' => 12900, 'color' => '#e11d48'],
+            ['category' => 'huidbehandelingen', 'name_nl' => 'Chemische Peeling', 'name_en' => 'Chemical Peel', 'name_ru' => 'Химический пилинг', 'duration_minutes' => 30, 'buffer_minutes' => 10, 'price_cents' => 8900, 'color' => '#a855f7'],
+
+            // Gezichtsbehandeling (Facial Treatments)
+            ['category' => 'gezichtsbehandeling', 'name_nl' => 'Hydrafacial', 'name_en' => 'Hydrafacial', 'name_ru' => 'Гидрафейшл', 'duration_minutes' => 60, 'buffer_minutes' => 10, 'price_cents' => 13900, 'color' => '#6366f1'],
+            ['category' => 'gezichtsbehandeling', 'name_nl' => 'Anti-Age Behandeling', 'name_en' => 'Anti-Age Treatment', 'name_ru' => 'Антивозрастной уход', 'duration_minutes' => 75, 'buffer_minutes' => 15, 'price_cents' => 15900, 'color' => '#8b5cf6'],
+            ['category' => 'gezichtsbehandeling', 'name_nl' => 'Acne Behandeling', 'name_en' => 'Acne Treatment', 'name_ru' => 'Лечение акне', 'duration_minutes' => 45, 'buffer_minutes' => 10, 'price_cents' => 9900, 'color' => '#14b8a6'],
+
+            // Lichaam (Body)
+            ['category' => 'lichaam', 'name_nl' => 'Lichaamspeeling', 'name_en' => 'Body Scrub', 'name_ru' => 'Скраб для тела', 'duration_minutes' => 30, 'buffer_minutes' => 10, 'price_cents' => 6900, 'color' => '#22c55e'],
+            ['category' => 'lichaam', 'name_nl' => 'Lichaamsmassage', 'name_en' => 'Body Massage', 'name_ru' => 'Массаж тела', 'duration_minutes' => 60, 'buffer_minutes' => 10, 'price_cents' => 8900, 'color' => '#10b981'],
         ];
 
         $serviceModels = [];
@@ -88,9 +94,10 @@ class DatabaseSeeder extends Seeder
                     'location_id' => $location->id,
                     'service_category_id' => $categoryModels[$svc['category']]->id,
                     'name_nl' => $svc['name_nl'],
-                    'name_en' => $svc['name_en'] ?? null,
+                    'name_en' => $svc['name_en'],
+                    'name_ru' => $svc['name_ru'],
                     'duration_minutes' => $svc['duration_minutes'],
-                    'buffer_minutes' => 10,
+                    'buffer_minutes' => $svc['buffer_minutes'],
                     'price_cents' => $svc['price_cents'],
                     'color' => $svc['color'],
                     'is_active' => true,
@@ -142,11 +149,19 @@ class DatabaseSeeder extends Seeder
 
         // ── Clients ────────────────────────────────────────────
         $clients = [
+            // Existing clients
             ['first_name' => 'Maria', 'last_name' => 'Bakker', 'email' => 'maria.bakker@example.com', 'phone' => '+31 6 1234 5678', 'gender' => 'female', 'date_of_birth' => '1985-03-15'],
             ['first_name' => 'Anna', 'last_name' => 'de Jong', 'email' => 'anna.dejong@example.com', 'phone' => '+31 6 2345 6789', 'gender' => 'female', 'date_of_birth' => '1990-07-22'],
             ['first_name' => 'Fatima', 'last_name' => 'El Amrani', 'email' => 'fatima@example.com', 'phone' => '+31 6 3456 7890', 'gender' => 'female', 'date_of_birth' => '1988-11-03'],
             ['first_name' => 'Peter', 'last_name' => 'Visser', 'email' => 'peter.visser@example.com', 'phone' => '+31 6 4567 8901', 'gender' => 'male', 'date_of_birth' => '1975-01-30'],
             ['first_name' => 'Svetlana', 'last_name' => 'Ivanova', 'email' => 'svetlana@example.com', 'phone' => '+31 6 5678 9012', 'gender' => 'female', 'locale' => 'ru', 'date_of_birth' => '1992-05-18'],
+
+            // New clients
+            ['first_name' => 'Sophie', 'last_name' => 'van den Berg', 'email' => 'sophie@email.nl', 'phone' => '+31 6 9876 5432', 'gender' => 'female', 'date_of_birth' => '1990-07-22'],
+            ['first_name' => 'Emma', 'last_name' => 'de Groot', 'email' => 'emma.degroot@gmail.com', 'phone' => '+31 6 5555 1234', 'gender' => 'female', 'date_of_birth' => '1988-11-03'],
+            ['first_name' => 'Anna', 'last_name' => 'Jansen', 'email' => 'anna.j@outlook.nl', 'phone' => '+31 6 4321 8765', 'gender' => 'female', 'date_of_birth' => '1995-02-14'],
+            ['first_name' => 'Lisa', 'last_name' => 'Bakker', 'email' => 'lisa.b@hotmail.nl', 'phone' => '+31 6 6789 1234', 'gender' => 'female', 'date_of_birth' => '1982-09-18'],
+            ['first_name' => 'Nadia', 'last_name' => 'Youssef', 'email' => 'nadia.y@email.nl', 'phone' => '+31 6 3456 7890', 'gender' => 'female', 'date_of_birth' => '1993-04-07'],
         ];
 
         $clientModels = [];
@@ -158,40 +173,76 @@ class DatabaseSeeder extends Seeder
         }
 
         // ── Appointments ───────────────────────────────────────
-        $statuses = ['scheduled', 'confirmed', 'completed', 'scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show', 'scheduled'];
+        // 15 appointments spread across this week and next week
+        $monday = now()->startOfWeek(); // Monday of this week
 
-        for ($i = 0; $i < 10; $i++) {
-            $service = $serviceModels[$i % count($serviceModels)];
-            $client = $clientModels[$i % count($clientModels)];
-            $emp = $employeeModels[$i % count($employeeModels)];
-            $status = $statuses[$i];
+        $appointments = [
+            // This week
+            ['day_offset' => 0, 'hour' => 9,  'service_idx' => 0, 'client_idx' => 0, 'employee_idx' => 0, 'status' => 'completed'],   // Mon - Laser Ontharing
+            ['day_offset' => 0, 'hour' => 11, 'service_idx' => 5, 'client_idx' => 1, 'employee_idx' => 0, 'status' => 'completed'],   // Mon - Hydrafacial
+            ['day_offset' => 1, 'hour' => 10, 'service_idx' => 1, 'client_idx' => 5, 'employee_idx' => 1, 'status' => 'completed'],   // Tue - Cryolipolyse
+            ['day_offset' => 1, 'hour' => 14, 'service_idx' => 9, 'client_idx' => 6, 'employee_idx' => 1, 'status' => 'confirmed'],   // Tue - Lichaamsmassage
+            ['day_offset' => 2, 'hour' => 9,  'service_idx' => 3, 'client_idx' => 2, 'employee_idx' => 0, 'status' => 'in_progress'], // Wed - Microneedling
+            ['day_offset' => 2, 'hour' => 13, 'service_idx' => 7, 'client_idx' => 7, 'employee_idx' => 2, 'status' => 'scheduled'],   // Wed - Acne Behandeling
+            ['day_offset' => 3, 'hour' => 10, 'service_idx' => 2, 'client_idx' => 8, 'employee_idx' => 0, 'status' => 'confirmed'],   // Thu - Velashape
+            ['day_offset' => 3, 'hour' => 15, 'service_idx' => 4, 'client_idx' => 3, 'employee_idx' => 0, 'status' => 'scheduled'],   // Thu - Chemische Peeling
+            ['day_offset' => 4, 'hour' => 11, 'service_idx' => 6, 'client_idx' => 4, 'employee_idx' => 0, 'status' => 'scheduled'],   // Fri - Anti-Age Behandeling
+            ['day_offset' => 4, 'hour' => 14, 'service_idx' => 8, 'client_idx' => 9, 'employee_idx' => 1, 'status' => 'confirmed'],   // Fri - Lichaamspeeling
 
-            // Spread appointments over the next 5 days
-            $startsAt = now()
-                ->addDays($i % 5)
-                ->setHour(9 + $i)
+            // Next week
+            ['day_offset' => 7, 'hour' => 9,  'service_idx' => 0, 'client_idx' => 5, 'employee_idx' => 0, 'status' => 'scheduled'],   // Mon - Laser Ontharing
+            ['day_offset' => 7, 'hour' => 13, 'service_idx' => 5, 'client_idx' => 6, 'employee_idx' => 0, 'status' => 'scheduled'],   // Mon - Hydrafacial
+            ['day_offset' => 8, 'hour' => 10, 'service_idx' => 1, 'client_idx' => 7, 'employee_idx' => 1, 'status' => 'confirmed'],   // Tue - Cryolipolyse
+            ['day_offset' => 9, 'hour' => 11, 'service_idx' => 3, 'client_idx' => 8, 'employee_idx' => 0, 'status' => 'scheduled'],   // Wed - Microneedling
+            ['day_offset' => 10, 'hour' => 14, 'service_idx' => 9, 'client_idx' => 9, 'employee_idx' => 1, 'status' => 'scheduled'],  // Thu - Lichaamsmassage
+        ];
+
+        foreach ($appointments as $appt) {
+            $service = $serviceModels[$appt['service_idx']];
+            $client = $clientModels[$appt['client_idx']];
+            $emp = $employeeModels[$appt['employee_idx']];
+
+            $startsAt = $monday->copy()
+                ->addDays($appt['day_offset'])
+                ->setHour($appt['hour'])
                 ->setMinute(0)
                 ->setSecond(0);
 
             $endsAt = $startsAt->copy()->addMinutes($service->duration_minutes);
 
-            $appointmentData = [
+            Appointment::create([
                 'location_id' => $location->id,
                 'client_id' => $client->id,
                 'user_id' => $emp->id,
                 'service_id' => $service->id,
                 'starts_at' => $startsAt,
                 'ends_at' => $endsAt,
-                'status' => $status,
-                'notes' => $i === 0 ? 'Eerste afspraak' : null,
-            ];
+                'status' => $appt['status'],
+                'notes' => null,
+            ]);
+        }
 
-            if ($status === 'cancelled') {
-                $appointmentData['cancelled_at'] = now();
-                $appointmentData['cancellation_reason'] = 'Klant heeft afgezegd';
-            }
+        // ── Client Notes ───────────────────────────────────────
+        $notes = [
+            ['client_idx' => 0, 'employee_idx' => 0, 'note' => 'Gevoelige huid, gebruik milde producten. Reageert goed op hydraterende serums.', 'is_private' => false],
+            ['client_idx' => 0, 'employee_idx' => 0, 'note' => 'Allergie voor parabenen vermeld bij intake.', 'is_private' => true],
+            ['client_idx' => 1, 'employee_idx' => 0, 'note' => 'Wil graag overstappen naar anti-age behandeltraject. Volgende afspraak consultatiegesprek plannen.', 'is_private' => false],
+            ['client_idx' => 2, 'employee_idx' => 0, 'note' => 'Heeft last van acne op de kaaklijn. Hormoongebonden, doorverwezen naar dermatoloog voor combinatieaanpak.', 'is_private' => false],
+            ['client_idx' => 4, 'employee_idx' => 1, 'note' => 'Предпочитает общение на русском языке. Чувствительная кожа в зоне декольте.', 'is_private' => false],
+            ['client_idx' => 5, 'employee_idx' => 0, 'note' => 'Eerste keer laser ontharing. Patch test uitgevoerd, geen reactie. Kan verdere behandelingen plannen.', 'is_private' => false],
+            ['client_idx' => 6, 'employee_idx' => 1, 'note' => 'Komt voor cryolipolyse buikzone. Foto\'s gemaakt voor-na vergelijking. Volgende sessie over 6 weken.', 'is_private' => false],
+            ['client_idx' => 7, 'employee_idx' => 2, 'note' => 'Jonge huid, milde acne. Gestart met maandelijks behandelplan. Thuiszorgadvies meegegeven.', 'is_private' => false],
+            ['client_idx' => 8, 'employee_idx' => 0, 'note' => 'Velashape behandeling bovenbenen. Goede resultaten na 3 sessies. Nog 2 behandelingen gepland.', 'is_private' => false],
+            ['client_idx' => 9, 'employee_idx' => 1, 'note' => 'Nieuwe klant via doorverwijzing. Geinteresseerd in combinatie lichaamsmassage + peeling. Proefbehandeling gehad.', 'is_private' => false],
+        ];
 
-            Appointment::create($appointmentData);
+        foreach ($notes as $note) {
+            ClientNote::create([
+                'client_id' => $clientModels[$note['client_idx']]->id,
+                'user_id' => $employeeModels[$note['employee_idx']]->id,
+                'note' => $note['note'],
+                'is_private' => $note['is_private'],
+            ]);
         }
     }
 }

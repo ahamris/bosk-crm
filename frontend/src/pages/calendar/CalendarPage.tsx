@@ -13,7 +13,7 @@ import {
 } from 'date-fns';
 import { nl, enUS, ru } from 'date-fns/locale';
 import type { Locale } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Receipt } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -24,7 +24,7 @@ import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { useAppointments, useEmployees, useClients, useServices, useCreateAppointment, useTransitionAppointment } from '../../hooks/useApi';
+import { useAppointments, useEmployees, useClients, useServices, useCreateAppointment, useTransitionAppointment, useCreateInvoiceFromAppointment } from '../../hooks/useApi';
 import { useLocationStore } from '../../stores/locationStore';
 import { localizedName } from '../../utils/locale';
 import type { Appointment } from '../../types';
@@ -89,6 +89,7 @@ export function CalendarPage() {
   const { data: services = [] } = useServices();
   const createAppointment = useCreateAppointment();
   const transitionAppointment = useTransitionAppointment();
+  const createInvoice = useCreateInvoiceFromAppointment();
 
   const clients = clientsData?.data ?? [];
 
@@ -342,6 +343,25 @@ export function CalendarPage() {
                 </Badge>
               </div>
             </div>
+
+            {detailAppointment.status === 'completed' && locationId && (
+              <div className="border-t border-slate-200 pt-4">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    createInvoice.mutateAsync({
+                      locationId,
+                      appointmentId: detailAppointment.id,
+                    }).then(() => setDetailAppointment(null));
+                  }}
+                  loading={createInvoice.isPending}
+                >
+                  <Receipt className="h-4 w-4" />
+                  {t('invoices.from_appointment')}
+                </Button>
+              </div>
+            )}
 
             {showCancelReason ? (
               <div className="space-y-3 border-t border-slate-200 pt-4">

@@ -24,6 +24,7 @@ class Client extends Model
         'notes',
         'locale',
         'is_active',
+        'moneybird_contact_id',
     ];
 
     protected function casts(): array

@@ -25,6 +25,7 @@ class Service extends Model
         'price_cents',
         'color',
         'is_active',
+        'moneybird_product_id',
     ];
 
     protected function casts(): array

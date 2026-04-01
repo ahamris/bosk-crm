@@ -161,6 +161,57 @@ export interface BookingSlot {
   end: string;
 }
 
+export interface Integration {
+  id: number;
+  provider: string;
+  name: string;
+  is_active: boolean;
+  settings: Record<string, string>;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AvailableIntegration {
+  provider: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface Invoice {
+  id: number;
+  location_id: number;
+  client_id: number;
+  client?: Client;
+  appointment_id: number | null;
+  appointment?: Appointment;
+  moneybird_invoice_id: string | null;
+  invoice_number: string | null;
+  status: 'draft' | 'open' | 'paid' | 'late';
+  total_cents: number;
+  tax_cents: number;
+  currency: string;
+  invoice_date: string;
+  due_date: string;
+  paid_at: string | null;
+  lines?: InvoiceLine[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InvoiceLine {
+  id: number;
+  invoice_id: number;
+  service_id: number | null;
+  service?: Service;
+  description: string;
+  quantity: number;
+  price_cents: number;
+  tax_rate: number;
+  total_cents: number;
+}
+
 export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;

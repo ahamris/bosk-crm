@@ -213,4 +213,56 @@ export async function getEmployeeWorkingHours(employeeId: number): Promise<Worki
   return data.data ?? data;
 }
 
+// Integrations
+export async function getIntegrations() {
+  const { data } = await api.get('/integrations');
+  return data;
+}
+
+export async function getIntegration(provider: string) {
+  const { data } = await api.get(`/integrations/${provider}`);
+  return data;
+}
+
+export async function updateIntegration(provider: string, payload: { settings: Record<string, string>; is_active?: boolean }) {
+  const { data } = await api.put(`/integrations/${provider}`, payload);
+  return data;
+}
+
+export async function testIntegration(provider: string) {
+  const { data } = await api.post(`/integrations/${provider}/test`);
+  return data;
+}
+
+export async function syncMoneybirdContacts() {
+  const { data } = await api.post('/integrations/moneybird/sync-contacts');
+  return data;
+}
+
+export async function syncMoneybirdProducts() {
+  const { data } = await api.post('/integrations/moneybird/sync-products');
+  return data;
+}
+
+// Invoices
+export async function getInvoices(locationId: number) {
+  const { data } = await api.get(`/locations/${locationId}/invoices`);
+  return data;
+}
+
+export async function createInvoiceFromAppointment(locationId: number, appointmentId: number) {
+  const { data } = await api.post(`/locations/${locationId}/appointments/${appointmentId}/invoice`);
+  return data;
+}
+
+export async function sendInvoice(locationId: number, invoiceId: number) {
+  const { data } = await api.post(`/locations/${locationId}/invoices/${invoiceId}/send`);
+  return data;
+}
+
+export async function markInvoicePaid(locationId: number, invoiceId: number) {
+  const { data } = await api.post(`/locations/${locationId}/invoices/${invoiceId}/mark-paid`);
+  return data;
+}
+
 export default api;

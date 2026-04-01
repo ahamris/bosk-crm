@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\V1\EmployeeController;
 use App\Http\Controllers\Api\V1\LocationController;
 use App\Http\Controllers\Api\V1\ServiceCategoryController;
 use App\Http\Controllers\Api\V1\ServiceController;
+use App\Http\Controllers\Api\V1\IntegrationController;
+use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\WorkingHourController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +69,25 @@ Route::middleware('auth:sanctum')->group(function () {
     // Working hours per employee
     Route::apiResource('employees.working-hours', WorkingHourController::class)
         ->parameters(['working-hours' => 'workingHour']);
+
+    // Integrations — Moneybird-specific routes first (before {provider} wildcard)
+    Route::post('integrations/moneybird/sync-contacts', [IntegrationController::class, 'syncContacts']);
+    Route::post('integrations/moneybird/sync-products', [IntegrationController::class, 'syncProducts']);
+    Route::get('integrations/moneybird/config', [IntegrationController::class, 'moneybirdConfig']);
+
+    // Integrations — generic CRUD
+    Route::get('integrations', [IntegrationController::class, 'index']);
+    Route::get('integrations/{provider}', [IntegrationController::class, 'show']);
+    Route::put('integrations/{provider}', [IntegrationController::class, 'update']);
+    Route::post('integrations/{provider}/test', [IntegrationController::class, 'testConnection']);
+
+    // Invoices
+    Route::get('locations/{location}/invoices', [InvoiceController::class, 'index']);
+    Route::post('locations/{location}/invoices', [InvoiceController::class, 'store']);
+    Route::get('locations/{location}/invoices/{invoice}', [InvoiceController::class, 'show']);
+    Route::post('locations/{location}/invoices/{invoice}/send', [InvoiceController::class, 'send']);
+    Route::post('locations/{location}/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid']);
+    Route::post('locations/{location}/appointments/{appointment}/invoice', [InvoiceController::class, 'fromAppointment']);
 });
 
 // Public booking widget (no auth required)

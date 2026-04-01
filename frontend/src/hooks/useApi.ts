@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from '../services/api';
 import { useLocationStore } from '../stores/locationStore';
-import type { Service, Client, Appointment } from '../types';
+import type { Service, Client, Appointment, Integration, AvailableIntegration } from '../types';
 
 function useActiveLocationId(): number | null {
   return useLocationStore((s) => s.activeLocationId);
@@ -203,6 +203,87 @@ export function useTransitionAppointment() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+// Integrations
+export function useIntegrations() {
+  return useQuery<{ configured: Integration[]; available: AvailableIntegration[] }>({
+    queryKey: ['integrations'],
+    queryFn: api.getIntegrations,
+  });
+}
+
+export function useUpdateIntegration() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ provider, payload }: { provider: string; payload: { settings: Record<string, string>; is_active?: boolean } }) =>
+      api.updateIntegration(provider, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['integrations'] });
+    },
+  });
+}
+
+export function useTestIntegration() {
+  return useMutation({
+    mutationFn: (provider: string) => api.testIntegration(provider),
+  });
+}
+
+export function useSyncMoneybirdContacts() {
+  return useMutation({
+    mutationFn: () => api.syncMoneybirdContacts(),
+  });
+}
+
+export function useSyncMoneybirdProducts() {
+  return useMutation({
+    mutationFn: () => api.syncMoneybirdProducts(),
+  });
+}
+
+// Invoices
+export function useInvoices() {
+  const locationId = useActiveLocationId();
+  return useQuery({
+    queryKey: ['invoices', locationId],
+    queryFn: () => api.getInvoices(locationId!),
+    enabled: !!locationId,
+  });
+}
+
+export function useCreateInvoiceFromAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ locationId, appointmentId }: { locationId: number; appointmentId: number }) =>
+      api.createInvoiceFromAppointment(locationId, appointmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    },
+  });
+}
+
+export function useSendInvoice() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ locationId, invoiceId }: { locationId: number; invoiceId: number }) =>
+      api.sendInvoice(locationId, invoiceId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+    },
+  });
+}
+
+export function useMarkInvoicePaid() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ locationId, invoiceId }: { locationId: number; invoiceId: number }) =>
+      api.markInvoicePaid(locationId, invoiceId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
     },
   });
 }

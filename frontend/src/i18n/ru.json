@@ -6,6 +6,9 @@
     "clients": "Клиенты",
     "services": "Услуги",
     "settings": "Настройки",
+    "invoices": "Счета",
+    "integrations": "Интеграции",
+    "ai": "AI Ассистент",
     "logout": "Выйти"
   },
   "auth": {
@@ -140,6 +143,42 @@
       "saturday": "Суббота",
       "sunday": "Воскресенье"
     }
+  },
+  "integrations": {
+    "title": "Интеграции",
+    "configured": "Настроено",
+    "not_configured": "Не настроено",
+    "coming_soon": "Скоро",
+    "test_connection": "Тест соединения",
+    "connection_success": "Подключение успешно!",
+    "save_activate": "Сохранить и активировать",
+    "sync_contacts": "Синхронизация контактов",
+    "sync_services": "Синхронизация услуг",
+    "api_token": "API Token",
+    "administration_id": "ID администрации"
+  },
+  "invoices": {
+    "title": "Счета",
+    "create": "Создать счёт",
+    "send": "Отправить в Moneybird",
+    "mark_paid": "Отметить оплаченным",
+    "from_appointment": "Создать счёт",
+    "status": {
+      "draft": "Черновик",
+      "open": "Открыт",
+      "paid": "Оплачен",
+      "late": "Просрочен"
+    }
+  },
+  "ai": {
+    "title": "AI Ассистент",
+    "smart_scheduling": "Умное планирование",
+    "client_insights": "Аналитика клиентов",
+    "auto_notes": "Авто-заметки",
+    "revenue_forecast": "Прогноз дохода",
+    "ask_placeholder": "Спросите о расписании...",
+    "coming_soon": "Скоро доступно",
+    "beta": "Beta"
   },
   "common": {
     "save": "Сохранить",

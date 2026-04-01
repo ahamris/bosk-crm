@@ -15,6 +15,9 @@ import { ClientListPage } from './pages/clients/ClientListPage';
 import { ClientDetailPage } from './pages/clients/ClientDetailPage';
 import { ServiceListPage } from './pages/services/ServiceListPage';
 import { SettingsPage } from './pages/settings/SettingsPage';
+import { IntegrationsPage } from './pages/settings/IntegrationsPage';
+import { InvoicesPage } from './pages/invoices/InvoicesPage';
+import { AiAssistantPage } from './pages/ai/AiAssistantPage';
 import { BookingPage } from './pages/booking/BookingPage';
 import { useAuthStore } from './stores/authStore';
 
@@ -95,6 +98,24 @@ const settingsRoute = createRoute({
   component: SettingsPage,
 });
 
+const integrationsRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/integrations',
+  component: IntegrationsPage,
+});
+
+const invoicesRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/invoices',
+  component: InvoicesPage,
+});
+
+const aiRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/ai',
+  component: AiAssistantPage,
+});
+
 // Public booking route (no auth, no layout)
 const bookingRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -113,6 +134,9 @@ const routeTree = rootRoute.addChildren([
     clientDetailRoute,
     serviceListRoute,
     settingsRoute,
+    integrationsRoute,
+    invoicesRoute,
+    aiRoute,
   ]),
 ]);
 

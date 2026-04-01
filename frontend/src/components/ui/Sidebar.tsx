@@ -6,7 +6,10 @@ import {
   Calendar,
   Users,
   Scissors,
+  Receipt,
   Settings,
+  Puzzle,
+  Sparkles,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -33,7 +36,10 @@ export function Sidebar() {
     { to: '/calendar', label: t('nav.calendar'), icon: <Calendar className="h-5 w-5" /> },
     { to: '/clients', label: t('nav.clients'), icon: <Users className="h-5 w-5" /> },
     { to: '/services', label: t('nav.services'), icon: <Scissors className="h-5 w-5" /> },
+    { to: '/invoices', label: t('nav.invoices'), icon: <Receipt className="h-5 w-5" /> },
     { to: '/settings', label: t('nav.settings'), icon: <Settings className="h-5 w-5" /> },
+    { to: '/integrations', label: t('nav.integrations'), icon: <Puzzle className="h-5 w-5" /> },
+    { to: '/ai', label: t('nav.ai'), icon: <Sparkles className="h-5 w-5" /> },
   ];
 
   const isActive = (to: string) => {

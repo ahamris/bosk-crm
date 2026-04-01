@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-type BadgeVariant = 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show' | 'default';
+type BadgeVariant = 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show' | 'default' | 'draft' | 'open' | 'paid' | 'late' | 'success' | 'coming_soon';
 
 interface BadgeProps {
   variant?: BadgeVariant;
@@ -16,6 +16,12 @@ const variantClasses: Record<BadgeVariant, string> = {
   cancelled: 'bg-red-100 text-red-700',
   no_show: 'bg-amber-100 text-amber-700',
   default: 'bg-slate-100 text-slate-600',
+  draft: 'bg-slate-100 text-slate-700',
+  open: 'bg-blue-100 text-blue-700',
+  paid: 'bg-emerald-100 text-emerald-700',
+  late: 'bg-red-100 text-red-700',
+  success: 'bg-emerald-100 text-emerald-700',
+  coming_soon: 'bg-amber-100 text-amber-700',
 };
 
 export function Badge({ variant = 'default', children, className }: BadgeProps) {
