@@ -40,6 +40,10 @@ class Client extends Model
         'bank_account',
         'moneybird_contact_id',
         'moneybird_customer_id',
+        'no_show_count',
+        'late_cancel_count',
+        'requires_deposit',
+        'requires_prepayment',
     ];
 
     protected function casts(): array
@@ -48,6 +52,8 @@ class Client extends Model
             'date_of_birth' => 'date',
             'is_active' => 'boolean',
             'marketing_consent' => 'boolean',
+            'requires_deposit' => 'boolean',
+            'requires_prepayment' => 'boolean',
         ];
     }
 

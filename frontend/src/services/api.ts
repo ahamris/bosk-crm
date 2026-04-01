@@ -195,6 +195,17 @@ export async function transitionAppointment(locationId: number, appointmentId: n
   return data.data ?? data;
 }
 
+// Public Landing & Booking Settings (no auth)
+export async function getPublicLanding(locationId: number) {
+  const { data } = await api.get(`/public/${locationId}/landing`);
+  return data.data ?? data;
+}
+
+export async function getPublicBookingSettings(locationId: number) {
+  const { data } = await api.get(`/public/${locationId}/booking-settings`);
+  return data.data ?? data;
+}
+
 // Public Booking (no auth)
 export async function getBookingServices(locationId: number): Promise<Service[]> {
   const { data } = await api.get(`/booking/${locationId}/services`);

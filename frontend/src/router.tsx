@@ -29,6 +29,8 @@ import { EmployeeEditPage } from './pages/employees/EmployeeEditPage';
 import { AiAssistantPage } from './pages/ai/AiAssistantPage';
 import { ReviewListPage } from './pages/reviews/ReviewListPage';
 import { BookingPage } from './pages/booking/BookingPage';
+import { LandingPage } from './pages/public/LandingPage';
+import { SalonPage } from './pages/public/SalonPage';
 import { useAuthStore } from './stores/authStore';
 
 // Root route
@@ -186,16 +188,44 @@ const aiRoute = createRoute({
   component: AiAssistantPage,
 });
 
-// Public booking route (no auth, no layout)
+// Public routes (no auth, no layout)
 const bookingRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/booking/$locationId',
   component: BookingPage,
 });
 
+const salonLandingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/salon/$locationId',
+  component: LandingPage,
+});
+
+const salonPageRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/salon/$locationId/info',
+  component: SalonPage,
+});
+
+const salonTeamRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/salon/$locationId/team',
+  component: SalonPage,
+});
+
+const salonReviewsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/salon/$locationId/reviews',
+  component: SalonPage,
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
   bookingRoute,
+  salonLandingRoute,
+  salonPageRoute,
+  salonTeamRoute,
+  salonReviewsRoute,
   authLayoutRoute.addChildren([loginRoute, registerRoute]),
   appLayoutRoute.addChildren([
     dashboardRoute,

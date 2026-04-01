@@ -13,7 +13,9 @@ use App\Http\Controllers\Api\V1\ServiceCategoryController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\InvoiceController;
+use App\Http\Controllers\Api\V1\BookingSettingController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\PublicController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\WebhookController;
 use App\Http\Controllers\Api\V1\WorkingHourController;
@@ -115,7 +117,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('locations/{location}/reviews/{review}', [ReviewController::class, 'show']);
     Route::patch('locations/{location}/reviews/{review}/toggle-publish', [ReviewController::class, 'togglePublish']);
     Route::delete('locations/{location}/reviews/{review}', [ReviewController::class, 'destroy']);
+
+    // Booking settings (admin)
+    Route::get('locations/{location}/booking-settings', [BookingSettingController::class, 'show']);
+    Route::put('locations/{location}/booking-settings', [BookingSettingController::class, 'update']);
 });
+
+// Public landing page (no auth required)
+Route::get('public/{location}/landing', [PublicController::class, 'landing']);
+Route::get('public/{location}/booking-settings', [PublicController::class, 'bookingSettings']);
 
 // Public booking widget (no auth required)
 Route::prefix('booking/{location}')->group(function () {

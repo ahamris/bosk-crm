@@ -239,15 +239,122 @@ reviews (id, client_id, appointment_id, employee_user_id, rating 1-5,
 - [x] Auto-refresh every 30s
 - [ ] Real-time push (WebSocket)
 
+### Phase 9 — Public Pages & Business Logic (Treatwell-inspired) 🚧
+
+#### 9.1 Business Logic — Policies & Rules
+```
+booking_settings (per location):
+  cancellation_window_hours: 24      # Free cancel before X hours
+  late_cancel_charge_percent: 100    # Charge % for late cancel
+  no_show_charge_percent: 100        # Charge % for no-show
+  max_pay_at_venue_bookings: 3       # Limit concurrent PAV bookings
+  require_deposit: false             # Require deposit on booking
+  deposit_percent: 50                # Deposit amount %
+  min_booking_notice_hours: 1        # Minimum advance booking time
+  max_booking_advance_days: 90       # How far ahead can book
+  auto_confirm: true                 # Auto-confirm or manual review
+  cancellation_policy_text_nl/en/ru  # Custom policy text
+```
+
+- [ ] Booking settings model + API (per location)
+- [ ] No-show tracking (auto-flag serial no-shows)
+- [ ] Late cancellation enforcement (charge logic)
+- [ ] Deposit/prepay rules for flagged clients
+- [ ] Cancellation window validation on booking cancel
+
+#### 9.2 Public Landing Page (`/`)
+Treatwell-inspired homepage for BOSK Gouda:
+- [ ] Hero section: clinic name, tagline, search/CTA button
+- [ ] Trending treatments carousel (top 6 services)
+- [ ] 3-column benefits (Professional care, Book 24/7, Trusted reviews)
+- [ ] Team showcase (employee cards with ratings)
+- [ ] Reviews carousel (latest published reviews)
+- [ ] Service categories grid with icons
+- [ ] Opening hours + location map
+- [ ] Footer: contact, policies, social links
+
+#### 9.3 Public Salon/Venue Page (`/salon/:slug`)
+Full venue page (like Treatwell place page):
+- [ ] Photo gallery (clinic images)
+- [ ] Salon info header (name, rating, review count, address)
+- [ ] Service menu (collapsible categories, price, duration, "Select" buttons)
+- [ ] Meet the team (staff cards with individual ratings + specializations)
+- [ ] Reviews section (filterable by service type, star rating)
+- [ ] About section (clinic description, trilingual)
+- [ ] Opening hours (day-by-day grid)
+- [ ] Location + map
+- [ ] Amenities/features (wheelchair, WiFi, parking, etc.)
+- [ ] Booking CTA (sticky on mobile)
+
+#### 9.4 Enhanced Booking Flow
+Upgrade from current 4-step wizard:
+- [ ] Multi-service cart (add multiple services to one booking)
+- [ ] Service packages (bundled services at discount)
+- [ ] Staff selection with individual availability + ratings
+- [ ] Cancellation policy display before confirmation
+- [ ] Terms & conditions checkbox
+- [ ] Marketing consent checkbox (GDPR)
+- [ ] Booking confirmation page with reference number
+- [ ] "Pay at venue" vs "Pay online" options (future: Mollie)
+
+#### 9.5 SEO & Public Routes
+```
+/                         Public landing page
+/salon/:slug              Venue/salon page
+/salon/:slug/services     Service menu (deep link)
+/salon/:slug/reviews      Reviews page
+/salon/:slug/team         Team page
+/booking/:locationId      Booking wizard (existing, enhanced)
+```
+
 ### Future Phases
 - [ ] Reporting & analytics (revenue dashboards, Recharts)
-- [ ] Marketing & loyalty (newsletters, points, discount codes)
+- [ ] Marketing & loyalty (newsletters, points, discount codes, referrals)
 - [ ] Treatment plans (multi-session, skin clinic)
 - [ ] AI real integration (scheduling, insights)
 - [ ] SMS/email reminders
 - [ ] Google Calendar sync
 - [ ] Typesense search
 - [ ] Mobile PWA
+- [ ] Gift cards (purchase + redeem)
+- [ ] Online payments (Mollie: iDEAL, card, Apple Pay)
+
+---
+
+## Business Logic Detail
+
+### Booking Lifecycle
+```
+Client selects service(s) → Picks employee + time → Enters details
+  → Accepts policies → Confirms booking
+    → Status: SCHEDULED
+      → Auto-confirm or manual review
+        → CONFIRMED
+          → Reminder sent (24h before)
+            → Client arrives → IN_PROGRESS → COMPLETED
+              → Auto-invoice → Moneybird → Email → Payment
+              → Auto-request review (24h after)
+            → Client doesn't arrive → NO_SHOW
+              → Flag client → Charge card (if prepaid)
+          → Client cancels (before window) → CANCELLED (free)
+          → Client cancels (after window) → CANCELLED (charged)
+```
+
+### No-Show Policy
+- First no-show: warning notification to client
+- Second no-show: flagged, future bookings require deposit
+- Third no-show: flagged as "require prepayment"
+- Admin can override flags manually
+
+### Cancellation Logic
+```
+if (now < appointment.starts_at - location.cancellation_window_hours):
+    → Free cancellation
+else:
+    → Late cancellation
+    → Charge: service.price * location.late_cancel_charge_percent / 100
+    → If Moneybird active: auto-create cancellation invoice
+```
 
 ---
 

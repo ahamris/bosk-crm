@@ -13,6 +13,7 @@ use App\Models\WorkingHour;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
@@ -126,6 +127,21 @@ class BookingController extends Controller
         $startsAt = Carbon::parse($validated['date'].' '.$validated['time']);
         $endsAt = $startsAt->copy()->addMinutes($service->duration_minutes);
 
+        // Load booking settings for validation
+        $settings = $location->bookingSetting;
+
+        // Check min_booking_notice_hours
+        $minNoticeHours = $settings?->min_booking_notice_hours ?? 1;
+        if ($startsAt->diffInHours(now(), false) > -$minNoticeHours) {
+            abort(422, "Bookings must be made at least {$minNoticeHours} hour(s) in advance.");
+        }
+
+        // Check max_booking_advance_days
+        $maxAdvanceDays = $settings?->max_booking_advance_days ?? 90;
+        if ($startsAt->diffInDays(now(), false) < -$maxAdvanceDays) {
+            abort(422, "Bookings cannot be made more than {$maxAdvanceDays} days in advance.");
+        }
+
         // Check for double booking
         $conflict = Appointment::where('user_id', $validated['employee_id'])
             ->whereDate('starts_at', $validated['date'])
@@ -151,18 +167,36 @@ class BookingController extends Controller
             ]
         );
 
+        // Check if client requires prepayment (flagged clients cannot use pay-at-venue)
+        if ($client->requires_prepayment) {
+            abort(422, 'This account requires prepayment. Please contact the salon to complete your booking.');
+        }
+
+        // Generate unique booking reference
+        $bookingReference = 'BOSK-' . now()->format('Y') . '-' . strtoupper(Str::random(5));
+        while (Appointment::where('booking_reference', $bookingReference)->exists()) {
+            $bookingReference = 'BOSK-' . now()->format('Y') . '-' . strtoupper(Str::random(5));
+        }
+
+        // Determine initial status based on auto_confirm setting
+        $status = ($settings?->auto_confirm ?? true)
+            ? Appointment::STATUS_CONFIRMED
+            : Appointment::STATUS_SCHEDULED;
+
         $appointment = $location->appointments()->create([
             'client_id' => $client->id,
             'user_id' => $validated['employee_id'],
             'service_id' => $validated['service_id'],
             'starts_at' => $startsAt,
             'ends_at' => $endsAt,
-            'status' => Appointment::STATUS_SCHEDULED,
+            'status' => $status,
+            'booking_reference' => $bookingReference,
             'notes' => $validated['notes'] ?? null,
         ]);
 
         return response()->json([
             'message' => 'Booking confirmed.',
+            'booking_reference' => $bookingReference,
             'appointment' => new AppointmentResource($appointment->load(['client', 'employee', 'service'])),
         ], 201);
     }

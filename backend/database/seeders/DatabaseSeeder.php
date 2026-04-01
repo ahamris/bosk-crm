@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Appointment;
+use App\Models\BookingSetting;
 use App\Models\Client;
 use App\Models\ClientNote;
 use App\Models\EmployeeProfile;
@@ -48,6 +49,33 @@ class DatabaseSeeder extends Seeder
                 'email' => 'info@bosk-gouda.nl',
                 'timezone' => 'Europe/Amsterdam',
                 'is_active' => true,
+            ]
+        );
+
+        // ── Booking Settings ───────────────────────────────────
+        BookingSetting::firstOrCreate(
+            ['location_id' => $location->id],
+            [
+                'cancellation_window_hours' => 24,
+                'late_cancel_charge_percent' => 100,
+                'no_show_charge_percent' => 100,
+                'max_pay_at_venue_bookings' => 3,
+                'require_deposit' => false,
+                'deposit_percent' => 50,
+                'min_booking_notice_hours' => 1,
+                'max_booking_advance_days' => 90,
+                'auto_confirm' => true,
+                'cancellation_policy_nl' => 'Annuleren is kosteloos tot 24 uur voor de afspraak. Bij te laat annuleren wordt het volledige bedrag in rekening gebracht.',
+                'cancellation_policy_en' => 'Cancellations are free up to 24 hours before the appointment. Late cancellations will be charged in full.',
+                'cancellation_policy_ru' => 'Отмена бесплатна за 24 часа до записи. При поздней отмене взимается полная стоимость.',
+                'amenities' => ['wheelchair_access', 'wifi', 'card_payment', 'parking_nearby'],
+                'social_links' => [
+                    'instagram' => 'https://instagram.com/boskgouda',
+                    'facebook' => 'https://facebook.com/boskgouda',
+                ],
+                'about_nl' => 'BOSK is een modern schoonheidssalon in het hart van Gouda. Wij bieden een breed scala aan huid- en lichaamsverzorgingen met de nieuwste technologieën. Ons team van ervaren specialisten staat klaar om u te verwennen.',
+                'about_en' => 'BOSK is a modern beauty salon in the heart of Gouda. We offer a wide range of skin and body treatments using the latest technologies. Our team of experienced specialists is ready to pamper you.',
+                'about_ru' => 'BOSK — это современный салон красоты в самом сердце Гауды. Мы предлагаем широкий спектр процедур по уходу за кожей и телом с использованием новейших технологий. Наша команда опытных специалистов готова позаботиться о вас.',
             ]
         );
 
@@ -177,6 +205,14 @@ class DatabaseSeeder extends Seeder
                 array_merge($cl, ['location_id' => $location->id, 'is_active' => true]),
             );
         }
+
+        // ── Client booking flags (for testing) ─────────────────
+        // Peter Visser: 2 no-shows, requires deposit
+        $clientModels[3]->update(['no_show_count' => 2, 'requires_deposit' => true]);
+        // Svetlana Ivanova: 3 late cancels, requires deposit
+        $clientModels[4]->update(['late_cancel_count' => 3, 'requires_deposit' => true]);
+        // Nadia Youssef: 3 no-shows, requires deposit + prepayment
+        $clientModels[9]->update(['no_show_count' => 3, 'requires_deposit' => true, 'requires_prepayment' => true]);
 
         // ── Appointments ───────────────────────────────────────
         // 15 appointments spread across this week and next week

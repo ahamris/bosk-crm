@@ -48,6 +48,7 @@ class Appointment extends Model
         'starts_at',
         'ends_at',
         'status',
+        'booking_reference',
         'notes',
         'cancelled_at',
         'cancellation_reason',

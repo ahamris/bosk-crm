@@ -111,6 +111,34 @@ class AppointmentController extends Controller
         if ($validated['status'] === Appointment::STATUS_CANCELLED) {
             $data['cancelled_at'] = now();
             $data['cancellation_reason'] = $validated['cancellation_reason'] ?? null;
+
+            // Check if this is a late cancellation
+            $settings = $location->bookingSetting;
+            $windowHours = $settings?->cancellation_window_hours ?? 24;
+
+            if ($appointment->starts_at && $appointment->starts_at->diffInHours(now(), false) > -$windowHours) {
+                // Late cancel — within the cancellation window
+                $client = $appointment->client;
+                if ($client) {
+                    $client->increment('late_cancel_count');
+                    if ($client->late_cancel_count >= 3) {
+                        $client->update(['requires_deposit' => true]);
+                    }
+                }
+            }
+        }
+
+        if ($validated['status'] === Appointment::STATUS_NO_SHOW) {
+            $client = $appointment->client;
+            if ($client) {
+                $client->increment('no_show_count');
+                if ($client->no_show_count >= 2) {
+                    $client->update(['requires_deposit' => true]);
+                }
+                if ($client->no_show_count >= 3) {
+                    $client->update(['requires_prepayment' => true]);
+                }
+            }
         }
 
         $appointment->update($data);
