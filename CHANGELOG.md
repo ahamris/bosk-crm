@@ -4,6 +4,23 @@ All notable changes to BOSK CRM will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] - 2026-04-01
+
+### Added
+- **Public Booking Widget** — 4-step booking wizard at `/booking/:locationId` (no auth required)
+  - Step 1: Service selection grouped by category
+  - Step 2: Date picker + available time slots per employee
+  - Step 3: Client details form
+  - Step 4: Confirmation + booking creation
+- **Appointment Status Transitions** — click appointments in calendar to manage status
+  - Scheduled → Confirmed → In Progress → Completed
+  - Cancel with reason prompt, No-show marking
+- **Client Notes** — full notes system on client detail page
+  - Add/delete notes with author tracking
+  - Private notes toggle
+- `in_progress` appointment status support throughout UI
+- 51 API routes (was 40)
+
 ## [0.2.0] - 2026-04-01
 
 ### Added
