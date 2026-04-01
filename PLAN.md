@@ -187,56 +187,67 @@ reviews (id, client_id, appointment_id, employee_user_id, rating 1-5,
 
 ### Phase 2 — Core Scheduling ✅
 - [x] Service catalog (10 services, 3 categories, trilingual)
-- [x] Online calendar (week view)
+- [x] Online calendar — week view, list view, kanban view
+- [x] Drag-and-drop appointment reschedule (@dnd-kit)
 - [x] Appointment CRUD with status machine
 - [x] Online booking widget (4-step public wizard)
-- [ ] Calendar list view
-- [ ] Calendar kanban view
-- [ ] SlidePanel for quick appointment edits
+- [x] SlidePanel/Sheet for quick appointment edits
 
 ### Phase 3 — Client Management ✅
-- [x] Client CRUD with search
+- [x] Client full CRUD pages (list/create/edit/detail)
+- [x] 20+ fields (contact, address, medical, skin type, Moneybird fields)
 - [x] Client notes (add/delete, private flag)
+- [x] Communication log (call/email/sms/whatsapp)
 - [x] Visit history on client detail
-- [ ] Client edit page (full CRUD)
-- [ ] Client reviews tab
 
-### Phase 4 — Invoicing & Integrations ✅
-- [x] Moneybird integration (contacts, products, invoices)
+### Phase 4 — Moneybird Integration ✅
+**Architecture: BOSK = booking + workflow + analytics. Moneybird = accounting truth.**
+- [x] Full field mapping (company, address, tax, KvK, IBAN, delivery method)
+- [x] Auto-sync: client create/update → Moneybird contact (ClientObserver)
+- [x] Auto-invoice: appointment completed → invoice → Moneybird → email to client (AppointmentObserver)
+- [x] Webhook receiver: Moneybird payment → BOSK invoice status update + notification
+- [x] Auto-register webhook when integration activated
 - [x] Integration marketplace UI (Moneybird, Mollie, Google Cal, Mailchimp)
-- [x] Invoice from appointment
-- [x] Invoice management (send, mark paid)
-- [ ] Automatic invoice on appointment completion
+- [ ] Invoice PDF download (from Moneybird API)
+- [ ] Bidirectional contact sync (Moneybird → BOSK via webhook)
 
-### Phase 5 — Employee & Freelancer Management 🚧
-- [ ] Employee list page with profiles
-- [ ] Staff vs freelancer types
-- [ ] Freelancer availability self-service
-- [ ] Working hours CRUD (connected to API)
-- [ ] Employee performance dashboard
+### Phase 5 — Employee & Freelancer Management ✅
+- [x] Employee list with cards, filter tabs (All/Staff/Freelancers)
+- [x] Employee detail (Profile, Schedule, Reviews, Performance tabs)
+- [x] Staff vs freelancer types
+- [x] Working hours CRUD (bulk update API)
+- [x] Employee create/edit pages
 - [ ] Commission tracking for freelancers
+- [ ] Freelancer self-service portal
 
-### Phase 6 — Reviews & Reputation 🚧
-- [ ] Review model + API
-- [ ] Post-appointment review request
-- [ ] Review display on employee profiles
-- [ ] Review widget on booking page
-- [ ] Average rating on employee cards
+### Phase 6 — Reviews & Reputation ✅
+- [x] Review model + API (CRUD, 15 seeded)
+- [x] Reviews management page with star ratings, publish toggle
+- [x] Average rating on employee cards + detail
+- [x] Public endpoint for booking widget
+- [ ] Post-appointment auto review request (email)
 
-### Phase 7 — UX Refactor 🚧
-- [ ] SlidePanel component (replace all modals for CRUD)
-- [ ] Full CRUD pages (create/edit/view) for all entities
-- [ ] Calendar: list view + kanban view
-- [ ] ConfirmDialog for destructive actions only
-- [ ] Fix all broken form submissions
+### Phase 7 — UX & Design System ✅
+- [x] @opencivics/ui (64 components) ported
+- [x] Sheet/SlidePanel, ConfirmDialog
+- [x] Full CRUD pages for all entities
+- [x] Calendar: week + list + kanban + drag-drop
+
+### Phase 8 — Notifications ✅
+- [x] Bell icon + red badge + dropdown + mark read
+- [x] 5 types: new_booking, new_review, reminder, cancelled, payment_received
+- [x] Auto-refresh every 30s
+- [ ] Real-time push (WebSocket)
 
 ### Future Phases
+- [ ] Reporting & analytics (revenue dashboards, Recharts)
 - [ ] Marketing & loyalty (newsletters, points, discount codes)
-- [ ] Reporting & analytics (revenue, employee performance)
-- [ ] Treatment plans (multi-session, skin clinic specific)
-- [ ] AI features (smart scheduling, client insights, auto-notes)
+- [ ] Treatment plans (multi-session, skin clinic)
+- [ ] AI real integration (scheduling, insights)
 - [ ] SMS/email reminders
 - [ ] Google Calendar sync
+- [ ] Typesense search
+- [ ] Mobile PWA
 
 ---
 

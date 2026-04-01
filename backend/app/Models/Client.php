@@ -23,7 +23,9 @@ class Client extends Model
         'city',
         'postal_code',
         'country',
+        'company_name',
         'preferred_contact',
+        'delivery_method',
         'source',
         'date_of_birth',
         'gender',
@@ -33,7 +35,11 @@ class Client extends Model
         'marketing_consent',
         'locale',
         'is_active',
+        'tax_number',
+        'chamber_of_commerce',
+        'bank_account',
         'moneybird_contact_id',
+        'moneybird_customer_id',
     ];
 
     protected function casts(): array

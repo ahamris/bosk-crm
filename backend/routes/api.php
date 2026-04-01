@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\WebhookController;
 use App\Http\Controllers\Api\V1\WorkingHourController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,9 @@ use Illuminate\Support\Facades\Route;
 | All routes are prefixed with /api/v1 (set in bootstrap/app.php).
 |
 */
+
+// Webhooks (no auth — verified by Moneybird token)
+Route::post('webhooks/moneybird', [WebhookController::class, 'moneybird']);
 
 // Public (no auth required)
 Route::post('auth/register', [AuthController::class, 'register']);

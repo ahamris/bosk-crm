@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Client;
 use App\Models\ClientNote;
 use App\Models\EmployeeProfile;
+use App\Models\Integration;
 use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Review;
@@ -353,5 +354,18 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $admin->id,
             ]));
         }
+
+        // ── Integrations ──────────────────────────────────────
+        Integration::firstOrCreate(
+            ['provider' => 'moneybird'],
+            [
+                'name' => 'Moneybird',
+                'is_active' => false,
+                'settings' => [
+                    'api_token' => '',
+                    'administration_id' => '',
+                ],
+            ]
+        );
     }
 }

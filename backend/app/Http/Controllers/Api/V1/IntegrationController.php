@@ -64,6 +64,17 @@ class IntegrationController extends Controller
             ]
         );
 
+        // Register Moneybird webhook when activating
+        if ($provider === 'moneybird' && ($validated['is_active'] ?? false)) {
+            try {
+                $client = app(MoneybirdClient::class);
+                $webhookUrl = url('/api/v1/webhooks/moneybird');
+                $client->registerWebhook($webhookUrl);
+            } catch (\Exception $e) {
+                \Log::warning("Failed to register Moneybird webhook: {$e->getMessage()}");
+            }
+        }
+
         return response()->json(['integration' => $integration]);
     }
 

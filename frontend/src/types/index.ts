@@ -259,7 +259,7 @@ export interface InvoiceLine {
 export interface AppNotification {
   id: number;
   user_id: number;
-  type: 'new_booking' | 'new_review' | 'appointment_reminder' | 'appointment_cancelled';
+  type: 'new_booking' | 'new_review' | 'appointment_reminder' | 'appointment_cancelled' | 'payment_received';
   title: string;
   message: string | null;
   data: Record<string, unknown> | null;

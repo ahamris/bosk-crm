@@ -113,6 +113,29 @@ class MoneybirdClient
             ->json();
     }
 
+    // Webhooks
+    public function registerWebhook(string $url): array
+    {
+        // First check if webhook already exists
+        $existing = $this->http()->get('/webhooks')->json();
+        foreach ($existing as $webhook) {
+            if ($webhook['url'] === $url) {
+                return $webhook; // Already registered
+            }
+        }
+
+        return $this->http()->post('/webhooks', [
+            'url' => $url,
+            'enabled_events' => [
+                'sales_invoice_state_changed_to_open',
+                'sales_invoice_state_changed_to_paid',
+                'sales_invoice_state_changed_to_late',
+                'payment_registered',
+                'contact_changed',
+            ],
+        ])->json();
+    }
+
     // Test connection
     public function testConnection(): bool
     {

@@ -21,17 +21,33 @@ class MoneybirdSync
         $data = [
             'firstname' => $client->first_name,
             'lastname' => $client->last_name,
+            'company_name' => $client->company_name,
             'email' => $client->email,
             'phone' => $client->phone,
+            'address1' => $client->address,
+            'zipcode' => $client->postal_code,
+            'city' => $client->city,
+            'country' => $client->country ?? 'NL',
+            'tax_number' => $client->tax_number,
+            'chamber_of_commerce' => $client->chamber_of_commerce,
+            'bank_account' => $client->bank_account,
+            'delivery_method' => $client->delivery_method ?? 'Email',
+            'send_invoices_to_email' => $client->email,
             'customer_id' => "BOSK-{$client->id}",
         ];
+
+        // Remove null values to avoid overwriting in Moneybird
+        $data = array_filter($data, fn($v) => $v !== null);
 
         if ($client->moneybird_contact_id) {
             $result = $this->client->updateContact($client->moneybird_contact_id, $data);
         } else {
             $result = $this->client->createContact($data);
             if (isset($result['id'])) {
-                $client->update(['moneybird_contact_id' => $result['id']]);
+                $client->updateQuietly([
+                    'moneybird_contact_id' => $result['id'],
+                    'moneybird_customer_id' => $result['customer_id'] ?? null,
+                ]);
             }
         }
 
