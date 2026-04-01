@@ -209,7 +209,7 @@ export async function getPublicBookingSettings(locationId: number) {
 // Public Booking (no auth)
 export async function getBookingServices(locationId: number): Promise<Service[]> {
   const { data } = await api.get(`/booking/${locationId}/services`);
-  return data.data ?? data;
+  return data.services ?? data.data ?? data;
 }
 
 export async function getBookingAvailability(locationId: number, params: { service_id: number; date: string; employee_id?: number }): Promise<{ slots: Array<{ time: string; employee_id: number; employee_name: string }> }> {
