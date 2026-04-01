@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\V1\BookingSettingController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PublicController;
 use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\ClientPortalController;
+use App\Http\Controllers\Api\V1\MessagingController;
 use App\Http\Controllers\Api\V1\WebhookController;
 use App\Http\Controllers\Api\V1\WorkingHourController;
 use Illuminate\Support\Facades\Route;
@@ -30,8 +32,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Webhooks (no auth — verified by Moneybird token)
+// Webhooks (no auth — verified by provider tokens)
 Route::post('webhooks/moneybird', [WebhookController::class, 'moneybird']);
+Route::post('webhooks/whatsapp', [MessagingController::class, 'whatsappWebhook']);
+Route::post('webhooks/telegram', [MessagingController::class, 'telegramWebhook']);
+Route::get('webhooks/whatsapp', fn() => response(request('hub_challenge'))); // WhatsApp verification
 
 // Public (no auth required)
 Route::post('auth/register', [AuthController::class, 'register']);
@@ -121,6 +126,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Booking settings (admin)
     Route::get('locations/{location}/booking-settings', [BookingSettingController::class, 'show']);
     Route::put('locations/{location}/booking-settings', [BookingSettingController::class, 'update']);
+
+    // Messaging
+    Route::post('messaging/send', [MessagingController::class, 'send']);
+    Route::post('messaging/confirm/{appointment}', [MessagingController::class, 'sendConfirmation']);
+
+    // Client Portal
+    Route::prefix('portal')->group(function () {
+        Route::get('profile', [ClientPortalController::class, 'profile']);
+        Route::put('profile', [ClientPortalController::class, 'updateProfile']);
+        Route::get('appointments', [ClientPortalController::class, 'appointments']);
+        Route::get('upcoming', [ClientPortalController::class, 'upcoming']);
+        Route::post('reviews', [ClientPortalController::class, 'submitReview']);
+        Route::post('appointments/{appointment}/cancel', [ClientPortalController::class, 'cancelAppointment']);
+    });
 });
 
 // Public landing page (no auth required)

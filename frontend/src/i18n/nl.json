@@ -304,6 +304,23 @@
     "view_all": "Bekijk alles",
     "closed": "Gesloten"
   },
+  "portal": {
+    "title": "Mijn BOSK",
+    "upcoming": "Aankomende afspraken",
+    "past": "Eerdere afspraken",
+    "profile": "Mijn profiel",
+    "leave_review": "Review achterlaten",
+    "cancel_appointment": "Afspraak annuleren",
+    "cancel_free": "Gratis annuleren",
+    "cancel_late": "Te laat annuleren — kosten kunnen van toepassing zijn",
+    "switch_admin": "Naar beheer",
+    "switch_client": "Klantenportaal",
+    "total_visits": "Totaal bezoeken",
+    "next_appointment": "Volgende afspraak",
+    "book_new": "Nieuwe afspraak",
+    "your_rating": "Uw beoordeling",
+    "review_submitted": "Bedankt voor uw review!"
+  },
   "common": {
     "save": "Opslaan",
     "cancel": "Annuleren",

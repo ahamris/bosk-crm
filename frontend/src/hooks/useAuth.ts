@@ -26,7 +26,7 @@ export function useAuth() {
     onSuccess: (data) => {
       setAuth(data.user, data.token);
       queryClient.invalidateQueries({ queryKey: ['me'] });
-      navigate({ to: '/' });
+      navigate({ to: '/admin' });
     },
   });
 
@@ -35,7 +35,7 @@ export function useAuth() {
     onSuccess: (data) => {
       setAuth(data.user, data.token);
       queryClient.invalidateQueries({ queryKey: ['me'] });
-      navigate({ to: '/' });
+      navigate({ to: '/admin' });
     },
   });
 

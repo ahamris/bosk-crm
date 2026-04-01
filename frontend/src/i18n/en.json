@@ -304,6 +304,23 @@
     "view_all": "View all",
     "closed": "Closed"
   },
+  "portal": {
+    "title": "My BOSK",
+    "upcoming": "Upcoming appointments",
+    "past": "Past appointments",
+    "profile": "My profile",
+    "leave_review": "Leave a review",
+    "cancel_appointment": "Cancel appointment",
+    "cancel_free": "Free cancellation",
+    "cancel_late": "Late cancellation — charges may apply",
+    "switch_admin": "Switch to admin",
+    "switch_client": "Client portal",
+    "total_visits": "Total visits",
+    "next_appointment": "Next appointment",
+    "book_new": "Book new",
+    "your_rating": "Your rating",
+    "review_submitted": "Thank you for your review!"
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

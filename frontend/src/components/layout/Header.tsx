@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, MapPin } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { User, MapPin, ArrowLeftRight } from 'lucide-react';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { NotificationBell } from './NotificationBell';
 import { useAuthStore } from '../../stores/authStore';
@@ -21,6 +22,9 @@ export function Header() {
     }
   }, [activeLocationId, locations, setActiveLocation]);
 
+  const hasClientProfile = user?.has_client_profile ||
+    user?.portals?.includes('client');
+
   return (
     <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
       <div>
@@ -29,6 +33,14 @@ export function Header() {
         </h1>
       </div>
       <div className="flex items-center gap-3">
+        {hasClientProfile && (
+          <Link to="/portal">
+            <button className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-100 transition-colors">
+              <ArrowLeftRight className="h-4 w-4" />
+              {t('portal.switch_client')}
+            </button>
+          </Link>
+        )}
         {locations.length > 0 && (
           <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5">
             <MapPin className="h-4 w-4 text-slate-500" />

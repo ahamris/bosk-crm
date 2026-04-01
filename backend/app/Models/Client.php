@@ -15,6 +15,7 @@ class Client extends Model
 
     protected $fillable = [
         'location_id',
+        'user_id',
         'first_name',
         'last_name',
         'email',
@@ -40,6 +41,7 @@ class Client extends Model
         'bank_account',
         'moneybird_contact_id',
         'moneybird_customer_id',
+        'telegram_chat_id',
         'no_show_count',
         'late_cancel_count',
         'requires_deposit',
@@ -55,6 +57,11 @@ class Client extends Model
             'requires_deposit' => 'boolean',
             'requires_prepayment' => 'boolean',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function location(): BelongsTo

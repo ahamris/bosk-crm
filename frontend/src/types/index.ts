@@ -2,9 +2,12 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'owner' | 'admin' | 'employee';
+  role: 'owner' | 'admin' | 'employee' | 'client';
+  roles?: string[];
   location_id: number | null;
   avatar_url: string | null;
+  has_client_profile?: boolean;
+  portals?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -55,6 +58,7 @@ export interface Service {
 
 export interface Client {
   id: number;
+  location_id: number;
   first_name: string;
   last_name: string;
   full_name: string;
@@ -76,6 +80,7 @@ export interface Client {
   marketing_consent: boolean;
   avatar_url: string | null;
   total_visits: number;
+  appointments_count?: number;
   last_visit_at: string | null;
   created_at: string;
   updated_at: string;

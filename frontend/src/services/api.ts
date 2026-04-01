@@ -355,4 +355,35 @@ export async function markAllNotificationsRead(): Promise<void> {
   await api.post('/notifications/mark-all-read');
 }
 
+// Portal (client self-service)
+export async function getPortalProfile(): Promise<Client> {
+  const { data } = await api.get('/portal/profile');
+  return data.data ?? data;
+}
+
+export async function updatePortalProfile(payload: Partial<Client>): Promise<Client> {
+  const { data } = await api.put('/portal/profile', payload);
+  return data.data ?? data;
+}
+
+export async function getPortalAppointments(): Promise<PaginatedResponse<Appointment>> {
+  const { data } = await api.get('/portal/appointments');
+  return data;
+}
+
+export async function getPortalUpcoming(): Promise<Appointment[]> {
+  const { data } = await api.get('/portal/upcoming');
+  return data.data ?? data;
+}
+
+export async function submitPortalReview(payload: { appointment_id: number; rating: number; comment?: string }): Promise<Review> {
+  const { data } = await api.post('/portal/reviews', payload);
+  return data.data ?? data;
+}
+
+export async function cancelPortalAppointment(appointmentId: number): Promise<{ message: string; free_cancel: boolean }> {
+  const { data } = await api.post(`/portal/appointments/${appointmentId}/cancel`);
+  return data;
+}
+
 export default api;

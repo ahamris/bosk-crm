@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Integration;
+use App\Services\Google\GoogleBusinessClient;
+use App\Services\Messaging\WhatsAppClient;
+use App\Services\Messaging\TelegramClient;
 use App\Services\Moneybird\MoneybirdClient;
 use App\Services\Moneybird\MoneybirdSync;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +27,9 @@ class IntegrationController extends Controller
             ['provider' => 'mollie', 'name' => 'Mollie', 'description' => 'Payment processing', 'icon' => 'mollie'],
             ['provider' => 'google_calendar', 'name' => 'Google Calendar', 'description' => 'Calendar sync', 'icon' => 'google'],
             ['provider' => 'mailchimp', 'name' => 'Mailchimp', 'description' => 'Email marketing', 'icon' => 'mailchimp'],
+            ['provider' => 'google_business', 'name' => 'Google Business', 'description' => 'Sync location, hours & reviews with Google', 'icon' => 'google'],
+            ['provider' => 'whatsapp', 'name' => 'WhatsApp Business', 'description' => 'Client messaging via WhatsApp', 'icon' => 'whatsapp'],
+            ['provider' => 'telegram', 'name' => 'Telegram Bot', 'description' => 'Staff notifications & client messaging', 'icon' => 'telegram'],
         ]);
 
         return response()->json([
@@ -99,6 +105,33 @@ class IntegrationController extends Controller
             }
 
             return response()->json(['success' => false, 'message' => 'Could not connect to Moneybird.'], 422);
+        }
+
+        if ($provider === 'google_business') {
+            $client = app(GoogleBusinessClient::class);
+            $success = $client->testConnection();
+
+            return $success
+                ? response()->json(['success' => true, 'message' => 'Connected to Google Business Profile.'])
+                : response()->json(['success' => false, 'message' => 'Could not connect to Google Business.'], 422);
+        }
+
+        if ($provider === 'whatsapp') {
+            $client = app(WhatsAppClient::class);
+            $success = $client->testConnection();
+
+            return $success
+                ? response()->json(['success' => true, 'message' => 'Connected to WhatsApp Business API.'])
+                : response()->json(['success' => false, 'message' => 'Could not connect to WhatsApp.'], 422);
+        }
+
+        if ($provider === 'telegram') {
+            $client = app(TelegramClient::class);
+            $success = $client->testConnection();
+
+            return $success
+                ? response()->json(['success' => true, 'message' => 'Connected to Telegram Bot.'])
+                : response()->json(['success' => false, 'message' => 'Could not connect to Telegram.'], 422);
         }
 
         return response()->json(['success' => false, 'message' => 'Unknown provider.'], 404);

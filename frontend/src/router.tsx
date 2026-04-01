@@ -31,6 +31,10 @@ import { ReviewListPage } from './pages/reviews/ReviewListPage';
 import { BookingPage } from './pages/booking/BookingPage';
 import { LandingPage } from './pages/public/LandingPage';
 import { SalonPage } from './pages/public/SalonPage';
+import { PortalLayout } from './components/layout/PortalLayout';
+import { PortalDashboard } from './pages/portal/PortalDashboard';
+import { PortalAppointments } from './pages/portal/PortalAppointments';
+import { PortalProfile } from './pages/portal/PortalProfile';
 import { useAuthStore } from './stores/authStore';
 
 // Root route
@@ -38,13 +42,20 @@ const rootRoute = createRootRoute({
   component: Outlet,
 });
 
-// Auth layout route (redirects to / if already logged in)
+// Public landing page = root
+const publicLandingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: LandingPage,
+});
+
+// Auth layout route (redirects to /admin if already logged in)
 const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'auth',
   beforeLoad: () => {
     if (useAuthStore.getState().isAuthenticated) {
-      throw redirect({ to: '/' });
+      throw redirect({ to: '/admin' });
     }
   },
   component: AuthLayout,
@@ -76,7 +87,7 @@ const appLayoutRoute = createRoute({
 
 const dashboardRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
-  path: '/',
+  path: '/admin',
   component: DashboardPage,
 });
 
@@ -219,14 +230,50 @@ const salonReviewsRoute = createRoute({
   component: SalonPage,
 });
 
+// Portal layout route (auth required, any role)
+const portalLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'portal',
+  beforeLoad: () => {
+    if (!useAuthStore.getState().isAuthenticated) {
+      throw redirect({ to: '/login' });
+    }
+  },
+  component: PortalLayout,
+});
+
+const portalDashboardRoute = createRoute({
+  getParentRoute: () => portalLayoutRoute,
+  path: '/portal',
+  component: PortalDashboard,
+});
+
+const portalAppointmentsRoute = createRoute({
+  getParentRoute: () => portalLayoutRoute,
+  path: '/portal/appointments',
+  component: PortalAppointments,
+});
+
+const portalProfileRoute = createRoute({
+  getParentRoute: () => portalLayoutRoute,
+  path: '/portal/profile',
+  component: PortalProfile,
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
+  publicLandingRoute,
   bookingRoute,
   salonLandingRoute,
   salonPageRoute,
   salonTeamRoute,
   salonReviewsRoute,
   authLayoutRoute.addChildren([loginRoute, registerRoute]),
+  portalLayoutRoute.addChildren([
+    portalDashboardRoute,
+    portalAppointmentsRoute,
+    portalProfileRoute,
+  ]),
   appLayoutRoute.addChildren([
     dashboardRoute,
     calendarRoute,

@@ -25,7 +25,7 @@ class AuthController extends Controller
         $token = $user->createToken($request->device_name ?? 'api')->plainTextToken;
 
         return response()->json([
-            'user' => new UserResource($user->load('roles')),
+            'user' => new UserResource($user->load(['roles', 'clientProfile'])),
             'token' => $token,
         ], 201);
     }
@@ -43,7 +43,7 @@ class AuthController extends Controller
         $token = $user->createToken($request->device_name ?? 'api')->plainTextToken;
 
         return response()->json([
-            'user' => new UserResource($user->load('roles')),
+            'user' => new UserResource($user->load(['roles', 'clientProfile'])),
             'token' => $token,
         ]);
     }
@@ -58,7 +58,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => new UserResource($request->user()->load(['roles', 'employeeProfile'])),
+            'user' => new UserResource($request->user()->load(['roles', 'employeeProfile', 'clientProfile'])),
         ]);
     }
 }

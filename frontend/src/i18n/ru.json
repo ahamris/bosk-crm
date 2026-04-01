@@ -304,6 +304,23 @@
     "view_all": "Смотреть все",
     "closed": "Закрыто"
   },
+  "portal": {
+    "title": "Мой BOSK",
+    "upcoming": "Предстоящие записи",
+    "past": "Прошлые записи",
+    "profile": "Мой профиль",
+    "leave_review": "Оставить отзыв",
+    "cancel_appointment": "Отменить запись",
+    "cancel_free": "Бесплатная отмена",
+    "cancel_late": "Поздняя отмена — могут быть начислены расходы",
+    "switch_admin": "Перейти в панель",
+    "switch_client": "Портал клиента",
+    "total_visits": "Всего визитов",
+    "next_appointment": "Следующая запись",
+    "book_new": "Новая запись",
+    "your_rating": "Ваша оценка",
+    "review_submitted": "Спасибо за ваш отзыв!"
+  },
   "common": {
     "save": "Сохранить",
     "cancel": "Отмена",

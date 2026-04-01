@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $manager = Role::firstOrCreate(['name' => 'manager']);
         $employee = Role::firstOrCreate(['name' => 'employee']);
         $receptionist = Role::firstOrCreate(['name' => 'receptionist']);
+        $clientRole = Role::firstOrCreate(['name' => 'client']);
 
         // ── Admin user ─────────────────────────────────────────
         $admin = User::firstOrCreate(
@@ -204,6 +205,40 @@ class DatabaseSeeder extends Seeder
                 ['email' => $cl['email']],
                 array_merge($cl, ['location_id' => $location->id, 'is_active' => true]),
             );
+        }
+
+        // ── Client Users (portal access) ──────────────────────
+        // Create a User with role 'client' for each client and link them
+        foreach ($clientModels as $client) {
+            if ($client->email && !$client->user_id) {
+                $clientUser = User::firstOrCreate(
+                    ['email' => $client->email],
+                    [
+                        'name' => $client->full_name,
+                        'password' => bcrypt('password'),
+                        'type' => 'client',
+                    ],
+                );
+                $clientUser->assignRole('client');
+                $client->update(['user_id' => $clientUser->id]);
+            }
+        }
+
+        // Also give admin a linked client profile for portal-switching demo
+        $adminClient = Client::firstOrCreate(
+            ['email' => 'admin@bosk.nl'],
+            [
+                'location_id' => $location->id,
+                'user_id' => $admin->id,
+                'first_name' => 'Admin',
+                'last_name' => 'Beheerder',
+                'email' => 'admin@bosk.nl',
+                'is_active' => true,
+                'preferred_contact' => 'email',
+            ],
+        );
+        if (!$adminClient->user_id) {
+            $adminClient->update(['user_id' => $admin->id]);
         }
 
         // ── Client booking flags (for testing) ─────────────────

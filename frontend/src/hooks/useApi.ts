@@ -476,3 +476,58 @@ export function useMarkAllRead() {
     },
   });
 }
+
+// ── Portal (Client self-service) ────────────────────────────
+
+export function usePortalProfile() {
+  return useQuery<Client>({
+    queryKey: ['portal', 'profile'],
+    queryFn: api.getPortalProfile,
+  });
+}
+
+export function useUpdatePortalProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Client>) => api.updatePortalProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['portal', 'profile'] });
+    },
+  });
+}
+
+export function usePortalAppointments() {
+  return useQuery({
+    queryKey: ['portal', 'appointments'],
+    queryFn: api.getPortalAppointments,
+  });
+}
+
+export function usePortalUpcoming() {
+  return useQuery<Appointment[]>({
+    queryKey: ['portal', 'upcoming'],
+    queryFn: api.getPortalUpcoming,
+  });
+}
+
+export function useSubmitPortalReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { appointment_id: number; rating: number; comment?: string }) =>
+      api.submitPortalReview(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['portal', 'appointments'] });
+    },
+  });
+}
+
+export function useCancelPortalAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (appointmentId: number) => api.cancelPortalAppointment(appointmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['portal', 'appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['portal', 'upcoming'] });
+    },
+  });
+}
