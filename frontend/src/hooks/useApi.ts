@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from '../services/api';
+import { useLocationStore } from '../stores/locationStore';
 import type { Service, Client, Appointment } from '../types';
+
+function useActiveLocationId(): number | null {
+  return useLocationStore((s) => s.activeLocationId);
+}
 
 // Dashboard
 export function useDashboard() {
@@ -13,9 +18,11 @@ export function useDashboard() {
 
 // Clients
 export function useClients(params?: { search?: string; page?: number }) {
+  const locationId = useActiveLocationId();
   return useQuery({
-    queryKey: ['clients', params],
-    queryFn: () => api.getClients(params),
+    queryKey: ['clients', locationId, params],
+    queryFn: () => api.getClients(locationId!, params),
+    enabled: !!locationId,
   });
 }
 
@@ -29,8 +36,9 @@ export function useClient(id: number) {
 
 export function useCreateClient() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
-    mutationFn: (data: Partial<Client>) => api.createClient(data),
+    mutationFn: (data: Partial<Client>) => api.createClient(locationId!, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
@@ -39,9 +47,10 @@ export function useCreateClient() {
 
 export function useUpdateClient() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
     mutationFn: ({ id, ...data }: Partial<Client> & { id: number }) =>
-      api.updateClient(id, data),
+      api.updateClient(locationId!, id, data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['clients', variables.id] });
@@ -51,9 +60,11 @@ export function useUpdateClient() {
 
 // Services
 export function useServices() {
+  const locationId = useActiveLocationId();
   return useQuery({
-    queryKey: ['services'],
-    queryFn: api.getServices,
+    queryKey: ['services', locationId],
+    queryFn: () => api.getServices(locationId!),
+    enabled: !!locationId,
   });
 }
 
@@ -66,8 +77,9 @@ export function useServiceCategories() {
 
 export function useCreateService() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
-    mutationFn: (data: Partial<Service>) => api.createService(data),
+    mutationFn: (data: Partial<Service>) => api.createService(locationId!, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       queryClient.invalidateQueries({ queryKey: ['service-categories'] });
@@ -77,9 +89,10 @@ export function useCreateService() {
 
 export function useUpdateService() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
     mutationFn: ({ id, ...data }: Partial<Service> & { id: number }) =>
-      api.updateService(id, data),
+      api.updateService(locationId!, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       queryClient.invalidateQueries({ queryKey: ['service-categories'] });
@@ -89,8 +102,9 @@ export function useUpdateService() {
 
 export function useDeleteService() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
-    mutationFn: (id: number) => api.deleteService(id),
+    mutationFn: (id: number) => api.deleteService(locationId!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       queryClient.invalidateQueries({ queryKey: ['service-categories'] });
@@ -104,16 +118,19 @@ export function useAppointments(params?: {
   employee_id?: number;
   status?: string;
 }) {
+  const locationId = useActiveLocationId();
   return useQuery({
-    queryKey: ['appointments', params],
-    queryFn: () => api.getAppointments(params),
+    queryKey: ['appointments', locationId, params],
+    queryFn: () => api.getAppointments(locationId!, params),
+    enabled: !!locationId,
   });
 }
 
 export function useCreateAppointment() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
-    mutationFn: (data: Partial<Appointment>) => api.createAppointment(data),
+    mutationFn: (data: Partial<Appointment>) => api.createAppointment(locationId!, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
@@ -123,9 +140,10 @@ export function useCreateAppointment() {
 
 export function useUpdateAppointment() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
     mutationFn: ({ id, ...data }: Partial<Appointment> & { id: number }) =>
-      api.updateAppointment(id, data),
+      api.updateAppointment(locationId!, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
@@ -135,8 +153,9 @@ export function useUpdateAppointment() {
 
 export function useCancelAppointment() {
   const queryClient = useQueryClient();
+  const locationId = useActiveLocationId();
   return useMutation({
-    mutationFn: (id: number) => api.cancelAppointment(id),
+    mutationFn: (id: number) => api.cancelAppointment(locationId!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });

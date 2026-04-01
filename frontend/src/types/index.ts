@@ -25,7 +25,10 @@ export interface Location {
 
 export interface ServiceCategory {
   id: number;
-  name: string;
+  name_nl: string;
+  name_en: string;
+  name_ru: string;
+  slug: string;
   description: string | null;
   sort_order: number;
   services?: Service[];
@@ -37,11 +40,14 @@ export interface Service {
   id: number;
   category_id: number;
   category?: ServiceCategory;
-  name: string;
+  name_nl: string;
+  name_en: string;
+  name_ru: string;
   description: string | null;
-  duration: number;
-  buffer_time: number;
-  price: number;
+  duration_minutes: number;
+  buffer_minutes: number;
+  price_cents: number;
+  color: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -51,9 +57,13 @@ export interface Client {
   id: number;
   first_name: string;
   last_name: string;
+  full_name: string;
   email: string | null;
   phone: string | null;
   date_of_birth: string | null;
+  gender: string | null;
+  locale: string | null;
+  is_active: boolean;
   notes: string | null;
   avatar_url: string | null;
   total_visits: number;
@@ -66,17 +76,17 @@ export interface Appointment {
   id: number;
   client_id: number;
   client?: Client;
-  employee_id: number;
+  user_id: number;
   employee?: Employee;
   service_id: number;
   service?: Service;
   location_id: number;
   location?: Location;
-  start_time: string;
-  end_time: string;
+  starts_at: string;
+  ends_at: string;
   status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
   notes: string | null;
-  price: number;
+  price_cents: number;
   created_at: string;
   updated_at: string;
 }
@@ -104,11 +114,24 @@ export interface WorkingHour {
   is_available: boolean;
 }
 
-export interface DashboardStats {
-  todays_appointments: number;
-  total_clients: number;
-  revenue_today: number;
-  upcoming_appointments: Appointment[];
+export interface DashboardStatsDay {
+  total: number;
+  scheduled: number;
+  confirmed: number;
+  completed: number;
+  cancelled: number;
+  no_show: number;
+}
+
+export interface DashboardResponse {
+  today: string;
+  appointments_today: Appointment[];
+  stats: {
+    today: DashboardStatsDay;
+    total_clients: number;
+    revenue_today_cents: number;
+    upcoming_7_days: number;
+  };
 }
 
 export interface PaginatedResponse<T> {

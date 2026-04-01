@@ -16,12 +16,13 @@ import { Badge } from '../../components/ui/Badge';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { useClient, useAppointments } from '../../hooks/useApi';
+import { localizedName } from '../../utils/locale';
 import clsx from 'clsx';
 
 type Tab = 'info' | 'history' | 'notes';
 
 export function ClientDetailPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams({ strict: false }) as { id: string };
   const [activeTab, setActiveTab] = useState<Tab>('info');
@@ -55,7 +56,7 @@ export function ClientDetailPage() {
           {t('common.back')}
         </Button>
         <h1 className="text-2xl font-bold text-slate-900">
-          {client.first_name} {client.last_name}
+          {client.full_name ?? `${client.first_name} ${client.last_name}`}
         </h1>
       </div>
 
@@ -67,7 +68,7 @@ export function ClientDetailPage() {
               {client.first_name[0]}{client.last_name[0]}
             </div>
             <h2 className="text-lg font-semibold text-slate-900">
-              {client.first_name} {client.last_name}
+              {client.full_name ?? `${client.first_name} ${client.last_name}`}
             </h2>
             <div className="mt-4 w-full space-y-3 text-left text-sm">
               {client.email && (
@@ -137,15 +138,15 @@ export function ClientDetailPage() {
                       <div key={apt.id} className="flex items-center justify-between py-3">
                         <div>
                           <p className="text-sm font-medium text-slate-900">
-                            {apt.service?.name}
+                            {apt.service ? localizedName(apt.service, i18n.language) : ''}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {format(new Date(apt.start_time), 'dd-MM-yyyy HH:mm')} - {apt.employee?.name}
+                            {format(new Date(apt.starts_at), 'dd-MM-yyyy HH:mm')} - {apt.employee?.name}
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-sm font-medium text-slate-700">
-                            €{apt.price?.toFixed(2)}
+                            {`\u20AC${(apt.price_cents / 100).toFixed(2)}`}
                           </span>
                           <Badge variant={apt.status}>
                             {t(`appointments.status.${apt.status}`)}

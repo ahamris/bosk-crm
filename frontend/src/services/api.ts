@@ -8,7 +8,7 @@ import type {
   Appointment,
   Employee,
   WorkingHour,
-  DashboardStats,
+  DashboardResponse,
   PaginatedResponse,
   LoginCredentials,
   RegisterData,
@@ -79,27 +79,27 @@ export async function updateLocation(id: number, payload: Partial<Location>): Pr
   return data.data ?? data;
 }
 
-// Services
-export async function getServices(): Promise<Service[]> {
-  const { data } = await api.get('/services');
+// Services (location-scoped)
+export async function getServices(locationId: number): Promise<Service[]> {
+  const { data } = await api.get(`/locations/${locationId}/services`);
   return data.data ?? data;
 }
 
-export async function createService(payload: Partial<Service>): Promise<Service> {
-  const { data } = await api.post('/services', payload);
+export async function createService(locationId: number, payload: Partial<Service>): Promise<Service> {
+  const { data } = await api.post(`/locations/${locationId}/services`, payload);
   return data.data ?? data;
 }
 
-export async function updateService(id: number, payload: Partial<Service>): Promise<Service> {
-  const { data } = await api.put(`/services/${id}`, payload);
+export async function updateService(locationId: number, id: number, payload: Partial<Service>): Promise<Service> {
+  const { data } = await api.put(`/locations/${locationId}/services/${id}`, payload);
   return data.data ?? data;
 }
 
-export async function deleteService(id: number): Promise<void> {
-  await api.delete(`/services/${id}`);
+export async function deleteService(locationId: number, id: number): Promise<void> {
+  await api.delete(`/locations/${locationId}/services/${id}`);
 }
 
-// Service Categories
+// Service Categories (not location-scoped)
 export async function getServiceCategories(): Promise<ServiceCategory[]> {
   const { data } = await api.get('/service-categories');
   return data.data ?? data;
@@ -110,9 +110,9 @@ export async function createServiceCategory(payload: Partial<ServiceCategory>): 
   return data.data ?? data;
 }
 
-// Clients
-export async function getClients(params?: { search?: string; page?: number }): Promise<PaginatedResponse<Client>> {
-  const { data } = await api.get('/clients', { params });
+// Clients (location-scoped)
+export async function getClients(locationId: number, params?: { search?: string; page?: number }): Promise<PaginatedResponse<Client>> {
+  const { data } = await api.get(`/locations/${locationId}/clients`, { params });
   return data;
 }
 
@@ -121,48 +121,48 @@ export async function getClient(id: number): Promise<Client> {
   return data.data ?? data;
 }
 
-export async function createClient(payload: Partial<Client>): Promise<Client> {
-  const { data } = await api.post('/clients', payload);
+export async function createClient(locationId: number, payload: Partial<Client>): Promise<Client> {
+  const { data } = await api.post(`/locations/${locationId}/clients`, payload);
   return data.data ?? data;
 }
 
-export async function updateClient(id: number, payload: Partial<Client>): Promise<Client> {
-  const { data } = await api.put(`/clients/${id}`, payload);
+export async function updateClient(locationId: number, id: number, payload: Partial<Client>): Promise<Client> {
+  const { data } = await api.put(`/locations/${locationId}/clients/${id}`, payload);
   return data.data ?? data;
 }
 
-// Appointments
-export async function getAppointments(params?: {
+// Appointments (location-scoped)
+export async function getAppointments(locationId: number, params?: {
   date?: string;
   employee_id?: number;
   status?: string;
 }): Promise<Appointment[]> {
-  const { data } = await api.get('/appointments', { params });
+  const { data } = await api.get(`/locations/${locationId}/appointments`, { params });
   return data.data ?? data;
 }
 
-export async function createAppointment(payload: Partial<Appointment>): Promise<Appointment> {
-  const { data } = await api.post('/appointments', payload);
+export async function createAppointment(locationId: number, payload: Partial<Appointment>): Promise<Appointment> {
+  const { data } = await api.post(`/locations/${locationId}/appointments`, payload);
   return data.data ?? data;
 }
 
-export async function updateAppointment(id: number, payload: Partial<Appointment>): Promise<Appointment> {
-  const { data } = await api.put(`/appointments/${id}`, payload);
+export async function updateAppointment(locationId: number, id: number, payload: Partial<Appointment>): Promise<Appointment> {
+  const { data } = await api.put(`/locations/${locationId}/appointments/${id}`, payload);
   return data.data ?? data;
 }
 
-export async function cancelAppointment(id: number): Promise<Appointment> {
-  const { data } = await api.patch(`/appointments/${id}/cancel`);
+export async function cancelAppointment(locationId: number, id: number): Promise<Appointment> {
+  const { data } = await api.patch(`/locations/${locationId}/appointments/${id}/cancel`);
   return data.data ?? data;
 }
 
-// Dashboard
-export async function getDashboard(): Promise<DashboardStats> {
+// Dashboard (not location-scoped)
+export async function getDashboard(): Promise<DashboardResponse> {
   const { data } = await api.get('/dashboard');
   return data.data ?? data;
 }
 
-// Employees
+// Employees (not location-scoped)
 export async function getEmployees(): Promise<Employee[]> {
   const { data } = await api.get('/employees');
   return data.data ?? data;

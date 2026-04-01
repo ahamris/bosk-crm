@@ -24,6 +24,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { useAppointments, useEmployees, useClients, useServices, useCreateAppointment } from '../../hooks/useApi';
+import { localizedName } from '../../utils/locale';
 import type { Appointment } from '../../types';
 
 const localeMap: Record<string, Locale> = { nl, en: enUS, ru };
@@ -73,7 +74,7 @@ export function CalendarPage() {
   const appointmentsByDay = useMemo(() => {
     const map = new Map<string, Appointment[]>();
     for (const apt of appointments) {
-      const day = format(parseISO(apt.start_time), 'yyyy-MM-dd');
+      const day = format(parseISO(apt.starts_at), 'yyyy-MM-dd');
       if (!map.has(day)) map.set(day, []);
       map.get(day)!.push(apt);
     }
@@ -97,14 +98,14 @@ export function CalendarPage() {
     const service = services.find((s) => s.id === Number(data.service_id));
     const [hours, minutes] = data.time.split(':').map(Number);
     const startTime = setMinutes(setHours(parseISO(data.date), hours), minutes);
-    const endTime = new Date(startTime.getTime() + (service?.duration ?? 60) * 60000);
+    const endTime = new Date(startTime.getTime() + (service?.duration_minutes ?? 60) * 60000);
 
     await createAppointment.mutateAsync({
       client_id: Number(data.client_id),
       service_id: Number(data.service_id),
-      employee_id: Number(data.employee_id),
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
+      user_id: Number(data.employee_id),
+      starts_at: startTime.toISOString(),
+      ends_at: endTime.toISOString(),
       notes: data.notes || null,
       status: 'scheduled',
     });
@@ -117,7 +118,7 @@ export function CalendarPage() {
     const dayKey = format(date, 'yyyy-MM-dd');
     const dayApts = appointmentsByDay.get(dayKey) || [];
     return dayApts.filter((apt) => {
-      const aptHour = parseISO(apt.start_time).getHours();
+      const aptHour = parseISO(apt.starts_at).getHours();
       return aptHour === hour;
     });
   };
@@ -215,9 +216,11 @@ export function CalendarPage() {
                             onClick={(e) => e.stopPropagation()}
                           >
                             <p className="font-medium text-primary-800 truncate">
-                              {apt.client?.first_name} {apt.client?.last_name?.[0]}.
+                              {apt.client?.full_name ?? `${apt.client?.first_name ?? ''} ${apt.client?.last_name?.[0] ?? ''}.`}
                             </p>
-                            <p className="text-primary-600 truncate">{apt.service?.name}</p>
+                            <p className="text-primary-600 truncate">
+                              {apt.service ? localizedName(apt.service, i18n.language) : ''}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -237,7 +240,7 @@ export function CalendarPage() {
             label={t('appointments.select_client')}
             options={clients.map((c) => ({
               value: c.id,
-              label: `${c.first_name} ${c.last_name}`,
+              label: c.full_name ?? `${c.first_name} ${c.last_name}`,
             }))}
             placeholder={t('appointments.select_client')}
             error={errors.client_id?.message}
@@ -247,7 +250,7 @@ export function CalendarPage() {
             label={t('appointments.select_service')}
             options={services.map((s) => ({
               value: s.id,
-              label: `${s.name} (${s.duration}min - €${s.price})`,
+              label: `${localizedName(s, i18n.language)} (${s.duration_minutes}min - \u20AC${(s.price_cents / 100).toFixed(2)})`,
             }))}
             placeholder={t('appointments.select_service')}
             error={errors.service_id?.message}

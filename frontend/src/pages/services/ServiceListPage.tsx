@@ -18,23 +18,26 @@ import {
   useUpdateService,
   useDeleteService,
 } from '../../hooks/useApi';
+import { localizedName } from '../../utils/locale';
 import type { Service, ServiceCategory } from '../../types';
 
 
 const serviceSchema = z.object({
-  name: z.string().min(1),
+  name_nl: z.string().min(1),
+  name_en: z.string().optional(),
+  name_ru: z.string().optional(),
   description: z.string().optional(),
   category_id: z.string().min(1),
-  duration: z.string().transform((v) => Number(v)).pipe(z.number().min(5)),
-  price: z.string().transform((v) => Number(v)).pipe(z.number().min(0)),
-  buffer_time: z.string().transform((v) => Number(v)).pipe(z.number().min(0)),
+  duration_minutes: z.string().transform((v) => Number(v)).pipe(z.number().min(5)),
+  price_cents: z.string().transform((v) => Number(v)).pipe(z.number().min(0)),
+  buffer_minutes: z.string().transform((v) => Number(v)).pipe(z.number().min(0)),
   is_active: z.string(),
 });
 
 type ServiceFormInput = z.input<typeof serviceSchema>;
 
 export function ServiceListPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
@@ -52,7 +55,7 @@ export function ServiceListPage() {
     formState: { errors },
   } = useForm<ServiceFormInput>({
     resolver: zodResolver(serviceSchema) as any,
-    defaultValues: { buffer_time: '0', is_active: 'true' },
+    defaultValues: { buffer_minutes: '0', is_active: 'true' },
   });
 
   const toggleCategory = (id: number) => {
@@ -66,30 +69,34 @@ export function ServiceListPage() {
 
   const openCreateModal = () => {
     setEditingService(null);
-    reset({ buffer_time: '0', is_active: 'true' });
+    reset({ buffer_minutes: '0', is_active: 'true' });
     setModalOpen(true);
   };
 
   const openEditModal = (service: Service) => {
     setEditingService(service);
-    setValue('name', service.name);
+    setValue('name_nl', service.name_nl);
+    setValue('name_en', service.name_en || '');
+    setValue('name_ru', service.name_ru || '');
     setValue('description', service.description || '');
     setValue('category_id', String(service.category_id));
-    setValue('duration', String(service.duration));
-    setValue('price', String(service.price));
-    setValue('buffer_time', String(service.buffer_time));
+    setValue('duration_minutes', String(service.duration_minutes));
+    setValue('price_cents', String(service.price_cents));
+    setValue('buffer_minutes', String(service.buffer_minutes));
     setValue('is_active', String(service.is_active));
     setModalOpen(true);
   };
 
   const onSubmit = async (data: any) => {
     const payload = {
-      name: data.name,
+      name_nl: data.name_nl,
+      name_en: data.name_en || '',
+      name_ru: data.name_ru || '',
       description: data.description || null,
       category_id: Number(data.category_id),
-      duration: data.duration,
-      price: data.price,
-      buffer_time: data.buffer_time,
+      duration_minutes: data.duration_minutes,
+      price_cents: data.price_cents,
+      buffer_minutes: data.buffer_minutes,
       is_active: data.is_active === 'true',
     };
 
@@ -161,7 +168,7 @@ export function ServiceListPage() {
                     ) : (
                       <ChevronRight className="h-4 w-4 text-slate-400" />
                     )}
-                    <h3 className="font-semibold text-slate-900">{cat.name}</h3>
+                    <h3 className="font-semibold text-slate-900">{localizedName(cat, i18n.language)}</h3>
                     <Badge>{(cat.services ?? []).length}</Badge>
                   </div>
                 </button>
@@ -175,7 +182,7 @@ export function ServiceListPage() {
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-slate-900">{service.name}</p>
+                            <p className="text-sm font-medium text-slate-900">{localizedName(service, i18n.language)}</p>
                             {!service.is_active && (
                               <Badge variant="cancelled">Inactive</Badge>
                             )}
@@ -187,10 +194,10 @@ export function ServiceListPage() {
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-1 text-sm text-slate-500">
                             <Clock className="h-3.5 w-3.5" />
-                            <span>{service.duration}min</span>
+                            <span>{service.duration_minutes}min</span>
                           </div>
                           <span className="text-sm font-semibold text-slate-900">
-                            €{service.price.toFixed(2)}
+                            {`\u20AC${(service.price_cents / 100).toFixed(2)}`}
                           </span>
                           <div className="flex items-center gap-1">
                             <button
@@ -224,9 +231,19 @@ export function ServiceListPage() {
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
-            label={t('services.service_name')}
-            error={errors.name?.message}
-            {...register('name')}
+            label={`${t('services.service_name')} (NL)`}
+            error={errors.name_nl?.message}
+            {...register('name_nl')}
+          />
+          <Input
+            label={`${t('services.service_name')} (EN)`}
+            error={errors.name_en?.message}
+            {...register('name_en')}
+          />
+          <Input
+            label={`${t('services.service_name')} (RU)`}
+            error={errors.name_ru?.message}
+            {...register('name_ru')}
           />
           <Input
             label={t('services.description')}
@@ -235,30 +252,29 @@ export function ServiceListPage() {
           />
           <Select
             label={t('services.category')}
-            options={allCategories.map((c) => ({ value: c.id, label: c.name }))}
+            options={allCategories.map((c) => ({ value: c.id, label: localizedName(c, i18n.language) }))}
             placeholder={t('services.category')}
             error={errors.category_id?.message}
             {...register('category_id')}
           />
           <div className="grid grid-cols-3 gap-4">
             <Input
-              label={t('services.duration')}
+              label={`${t('services.duration')} (min)`}
               type="number"
-              error={errors.duration?.message}
-              {...register('duration')}
+              error={errors.duration_minutes?.message}
+              {...register('duration_minutes')}
             />
             <Input
-              label={t('services.price')}
+              label={`${t('services.price')} (cents)`}
               type="number"
-              step="0.01"
-              error={errors.price?.message}
-              {...register('price')}
+              error={errors.price_cents?.message}
+              {...register('price_cents')}
             />
             <Input
-              label={t('services.buffer_time')}
+              label={`${t('services.buffer_time')} (min)`}
               type="number"
-              error={errors.buffer_time?.message}
-              {...register('buffer_time')}
+              error={errors.buffer_minutes?.message}
+              {...register('buffer_minutes')}
             />
           </div>
           <Select
