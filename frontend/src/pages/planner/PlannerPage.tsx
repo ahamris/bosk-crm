@@ -12,13 +12,7 @@ import {
 } from 'date-fns';
 import { nl, enUS, ru } from 'date-fns/locale';
 import type { Locale } from 'date-fns/locale';
-import dayjs from 'dayjs';
-import Timeline, {
-  TimelineHeaders,
-  SidebarHeader,
-  DateHeader,
-} from 'react-calendar-timeline';
-import 'react-calendar-timeline/dist/style.css';
+import { TimelineView } from '../../components/planner/TimelineView';
 import {
   DndContext,
   DragOverlay,
@@ -121,15 +115,6 @@ const STATUS_COLORS: Record<AppointmentStatus, string> = {
   no_show: 'bg-amber-100 border-amber-200 text-amber-700',
 };
 
-/** Background colors for timeline items (inline styles). */
-const TIMELINE_STATUS_BG: Record<string, { bg: string; border: string; text: string }> = {
-  scheduled:   { bg: '#dbeafe', border: '#93c5fd', text: '#1e40af' },
-  confirmed:   { bg: '#d1fae5', border: '#6ee7b7', text: '#065f46' },
-  in_progress: { bg: '#fef3c7', border: '#fcd34d', text: '#92400e' },
-  completed:   { bg: '#f1f5f9', border: '#cbd5e1', text: '#475569' },
-  cancelled:   { bg: '#fef2f2', border: '#fecaca', text: '#b91c1c' },
-  no_show:     { bg: '#fef2f2', border: '#fecaca', text: '#b91c1c' },
-};
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -495,72 +480,20 @@ export function PlannerPage() {
     </div>
   );
 
-  // ---- Timeline View (react-calendar-timeline) ----
+  // ---- Timeline View (custom GSTC-style) ----
+  const handleTimelineSlotClick = useCallback(
+    (employeeId: number, time: Date) => {
+      reset();
+      setValue('date', format(time, 'yyyy-MM-dd'));
+      setValue('time', format(time, 'HH:mm'));
+      setValue('employee_id', String(employeeId));
+      setCreatePanelOpen(true);
+    },
+    [reset, setValue],
+  );
+
   const renderTimelineView = () => {
-    const groups = employees.map((emp) => ({
-      id: emp.id,
-      title: emp.name,
-      rightTitle: emp.type === 'freelancer' ? '\uD83C\uDFF7\uFE0F' : '',
-    }));
-
-    const items = rangeAppointments
-      .filter((apt) => apt.status !== 'cancelled' && apt.status !== 'no_show')
-      .map((apt) => ({
-        id: apt.id,
-        group: apt.employee?.id ?? apt.user_id,
-        title: `${apt.client?.first_name ?? ''} — ${apt.service ? localizedName(apt.service, i18n.language) : ''}`,
-        start_time: dayjs(apt.starts_at).valueOf(),
-        end_time: dayjs(apt.ends_at).valueOf(),
-        canMove: apt.status === 'scheduled' || apt.status === 'confirmed',
-        canResize: false,
-        itemProps: {
-          style: {
-            background: TIMELINE_STATUS_BG[apt.status]?.bg ?? '#e2e8f0',
-            borderColor: TIMELINE_STATUS_BG[apt.status]?.border ?? '#94a3b8',
-            color: TIMELINE_STATUS_BG[apt.status]?.text ?? '#334155',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderRadius: '6px',
-            fontSize: '12px',
-            overflow: 'hidden',
-          },
-        },
-        _appointment: apt,
-      }));
-
-    const handleItemMove = async (
-      itemId: number,
-      dragTime: number,
-      newGroupOrder: number,
-    ) => {
-      const apt = appointments.find((a) => a.id === itemId);
-      if (!apt) return;
-
-      const originalStart = dayjs(apt.starts_at);
-      const originalEnd = dayjs(apt.ends_at);
-      const durationMs = originalEnd.valueOf() - originalStart.valueOf();
-
-      const newEmployee = groups[newGroupOrder];
-      if (!newEmployee) return;
-
-      try {
-        await updateAppointment.mutateAsync({
-          id: apt.id,
-          starts_at: new Date(dragTime).toISOString(),
-          ends_at: new Date(dragTime + durationMs).toISOString(),
-          user_id: newEmployee.id,
-        });
-      } catch {
-        // handled by react-query
-      }
-    };
-
-    const handleItemSelect = (itemId: number) => {
-      const apt = appointments.find((a) => a.id === itemId);
-      if (apt) openDetail(apt);
-    };
-
-    if (groups.length === 0) {
+    if (employees.length === 0) {
       return (
         <>
           {dateRangeSelector}
@@ -586,57 +519,15 @@ export function PlannerPage() {
             <LoadingSpinner size="lg" />
           </div>
         ) : (
-          <div className="planner-timeline">
-            <Timeline
-              groups={groups}
-              items={items}
-              defaultTimeStart={dayjs(rangeStart).valueOf()}
-              defaultTimeEnd={dayjs(rangeEnd).valueOf()}
-              visibleTimeStart={dayjs(rangeStart).valueOf()}
-              visibleTimeEnd={dayjs(rangeEnd).valueOf()}
-              onItemMove={handleItemMove}
-              onItemSelect={handleItemSelect}
-              lineHeight={50}
-              itemHeightRatio={0.75}
-              sidebarWidth={150}
-              canMove={true}
-              canResize={false}
-              itemRenderer={({ item, itemContext, getItemProps }) => {
-                const props = getItemProps({});
-                return (
-                  <div
-                    {...props}
-                    style={{
-                      ...props.style,
-                      ...item.itemProps?.style,
-                      lineHeight: `${itemContext.dimensions.height}px`,
-                    }}
-                    title={item.title}
-                  >
-                    <span className="block truncate px-2 text-xs font-medium">
-                      {itemContext.title}
-                    </span>
-                  </div>
-                );
-              }}
-            >
-              <TimelineHeaders>
-                <SidebarHeader>
-                  {({ getRootProps }) => (
-                    <div
-                      {...getRootProps()}
-                      className="flex items-center justify-center text-sm font-semibold text-slate-600"
-                      style={{ ...getRootProps().style, background: '#f1f5f9' }}
-                    >
-                      {t('planner.employee')}
-                    </div>
-                  )}
-                </SidebarHeader>
-                <DateHeader unit="primaryHeader" />
-                <DateHeader unit="hour" />
-              </TimelineHeaders>
-            </Timeline>
-          </div>
+          <TimelineView
+            employees={employees}
+            appointments={rangeAppointments}
+            rangeStart={rangeStart}
+            rangeEnd={rangeEnd}
+            onAppointmentClick={openDetail}
+            onSlotClick={handleTimelineSlotClick}
+            lang={i18n.language}
+          />
         )}
       </>
     );
@@ -938,23 +829,6 @@ export function PlannerPage() {
         {activeView === 'list' && renderListView()}
         {activeView === 'kanban' && renderKanbanView()}
       </Card>
-
-      {/* Timeline CSS overrides */}
-      <style>{`
-        .planner-timeline .react-calendar-timeline .rct-header-root {
-          background: #f8fafc;
-        }
-        .planner-timeline .react-calendar-timeline .rct-sidebar {
-          background: white;
-        }
-        .planner-timeline .react-calendar-timeline .rct-sidebar-header {
-          background: #f1f5f9;
-        }
-        .planner-timeline .react-calendar-timeline .rct-horizontal-lines .rct-hl-even,
-        .planner-timeline .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
-          border-bottom: 1px solid #e2e8f0;
-        }
-      `}</style>
 
       {/* ================================================================== */}
       {/* Appointment Detail SlidePanel                                       */}
