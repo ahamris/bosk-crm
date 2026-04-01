@@ -10,7 +10,7 @@ import { AuthLayout } from './components/layout/AuthLayout';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
-import { CalendarPage } from './pages/calendar/CalendarPage';
+import { PlannerPage } from './pages/planner/PlannerPage';
 import { ClientListPage } from './pages/clients/ClientListPage';
 import { ClientCreatePage } from './pages/clients/ClientCreatePage';
 import { ClientDetailPage } from './pages/clients/ClientDetailPage';
@@ -91,10 +91,10 @@ const dashboardRoute = createRoute({
   component: DashboardPage,
 });
 
-const calendarRoute = createRoute({
+const plannerRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
-  path: '/calendar',
-  component: CalendarPage,
+  path: '/planner',
+  component: PlannerPage,
 });
 
 const clientListRoute = createRoute({
@@ -276,7 +276,7 @@ const routeTree = rootRoute.addChildren([
   ]),
   appLayoutRoute.addChildren([
     dashboardRoute,
-    calendarRoute,
+    plannerRoute,
     clientListRoute,
     clientCreateRoute,
     clientDetailRoute,

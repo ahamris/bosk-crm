@@ -64,7 +64,7 @@ export function DashboardPage() {
           value={todaysTotal}
           icon="calendar-check"
           color="bg-blue-50 text-blue-600"
-          href="/calendar"
+          href="/planner"
         />
         <StatCard
           label={t('dashboard.total_clients')}
@@ -160,7 +160,7 @@ export function DashboardPage() {
                         variant="ghost"
                         size="xs"
                         icon="eye"
-                        onClick={() => navigate({ to: '/calendar' })}
+                        onClick={() => navigate({ to: '/planner' })}
                       >
                         {t('common.view')}
                       </Button>
@@ -185,7 +185,7 @@ export function DashboardPage() {
       <div>
         <h2 className="mb-3 text-sm font-semibold text-zinc-900">{t('dashboard.quick_actions', { defaultValue: 'Quick Actions' })}</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Link to="/calendar" className="block">
+          <Link to="/planner" className="block">
             <Card hover>
               <div className="flex items-center gap-3">
                 <div className="rounded-lg bg-blue-50 p-3 text-blue-600">

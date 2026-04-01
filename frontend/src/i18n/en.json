@@ -2,7 +2,7 @@
   "app_name": "BOSK CRM",
   "nav": {
     "dashboard": "Dashboard",
-    "calendar": "Calendar",
+    "planner": "Planner",
     "clients": "Clients",
     "services": "Services",
     "settings": "Settings",
@@ -35,14 +35,18 @@
     "no_appointments_today": "No appointments today",
     "welcome_back": "Welcome back"
   },
-  "calendar": {
-    "title": "Calendar",
-    "today": "Today",
+  "planner": {
+    "title": "Planner",
+    "timeline": "Timeline",
     "week": "Week",
     "list": "List",
     "kanban": "Board",
+    "today": "Today",
+    "3_days": "3 days",
+    "7_days": "7 days",
     "new_appointment": "New appointment",
     "no_appointments": "No appointments",
+    "employee": "Employee",
     "scheduled": "Scheduled",
     "confirmed": "Confirmed",
     "in_progress": "In Progress",

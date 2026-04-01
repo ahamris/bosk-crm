@@ -35,7 +35,7 @@ export function Sidebar() {
 
   const navItems: NavItem[] = [
     { to: '/admin', label: t('nav.dashboard'), icon: <LayoutDashboard className="h-5 w-5" /> },
-    { to: '/calendar', label: t('nav.calendar'), icon: <Calendar className="h-5 w-5" /> },
+    { to: '/planner', label: t('nav.planner'), icon: <Calendar className="h-5 w-5" /> },
     { to: '/clients', label: t('nav.clients'), icon: <Users className="h-5 w-5" /> },
     { to: '/employees', label: t('nav.employees'), icon: <UserCheck className="h-5 w-5" /> },
     { to: '/reviews', label: t('nav.reviews'), icon: <Star className="h-5 w-5" /> },

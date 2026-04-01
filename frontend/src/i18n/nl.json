@@ -2,7 +2,7 @@
   "app_name": "BOSK CRM",
   "nav": {
     "dashboard": "Dashboard",
-    "calendar": "Agenda",
+    "planner": "Planner",
     "clients": "Klanten",
     "services": "Diensten",
     "settings": "Instellingen",
@@ -35,14 +35,18 @@
     "no_appointments_today": "Geen afspraken vandaag",
     "welcome_back": "Welkom terug"
   },
-  "calendar": {
-    "title": "Agenda",
-    "today": "Vandaag",
+  "planner": {
+    "title": "Planner",
+    "timeline": "Tijdlijn",
     "week": "Week",
     "list": "Lijst",
     "kanban": "Bord",
+    "today": "Vandaag",
+    "3_days": "3 dagen",
+    "7_days": "7 dagen",
     "new_appointment": "Nieuwe afspraak",
     "no_appointments": "Geen afspraken",
+    "employee": "Medewerker",
     "scheduled": "Gepland",
     "confirmed": "Bevestigd",
     "in_progress": "Bezig",

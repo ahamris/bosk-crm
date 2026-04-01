@@ -2,7 +2,7 @@
   "app_name": "BOSK CRM",
   "nav": {
     "dashboard": "Панель",
-    "calendar": "Календарь",
+    "planner": "Планнер",
     "clients": "Клиенты",
     "services": "Услуги",
     "settings": "Настройки",
@@ -35,14 +35,18 @@
     "no_appointments_today": "Нет записей на сегодня",
     "welcome_back": "С возвращением"
   },
-  "calendar": {
-    "title": "Календарь",
-    "today": "Сегодня",
+  "planner": {
+    "title": "Планнер",
+    "timeline": "Таймлайн",
     "week": "Неделя",
     "list": "Список",
-    "kanban": "Доска",
+    "kanban": "Канбан",
+    "today": "Сегодня",
+    "3_days": "3 дня",
+    "7_days": "7 дней",
     "new_appointment": "Новая запись",
     "no_appointments": "Нет записей",
+    "employee": "Сотрудник",
     "scheduled": "Запланировано",
     "confirmed": "Подтверждено",
     "in_progress": "В процессе",
