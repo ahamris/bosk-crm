@@ -15,6 +15,7 @@ class ServiceCategoryController extends Controller
     public function index(): AnonymousResourceCollection
     {
         $categories = ServiceCategory::query()
+            ->with('services')
             ->withCount('services')
             ->orderBy('sort_order')
             ->paginate(25);

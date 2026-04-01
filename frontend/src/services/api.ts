@@ -61,7 +61,7 @@ export async function logout(): Promise<void> {
 
 export async function getMe(): Promise<User> {
   const { data } = await api.get('/auth/me');
-  return data.data ?? data;
+  return data.user ?? data.data ?? data;
 }
 
 // Locations
@@ -117,8 +117,8 @@ export async function getClients(locationId: number, params?: { search?: string;
   return data;
 }
 
-export async function getClient(id: number): Promise<Client> {
-  const { data } = await api.get(`/clients/${id}`);
+export async function getClient(locationId: number, id: number): Promise<Client> {
+  const { data } = await api.get(`/locations/${locationId}/clients/${id}`);
   return data.data ?? data;
 }
 
@@ -168,7 +168,7 @@ export async function updateAppointment(locationId: number, id: number, payload:
 }
 
 export async function cancelAppointment(locationId: number, id: number): Promise<Appointment> {
-  const { data } = await api.patch(`/locations/${locationId}/appointments/${id}/cancel`);
+  const { data } = await api.patch(`/locations/${locationId}/appointments/${id}/transition`, { status: 'cancelled' });
   return data.data ?? data;
 }
 

@@ -27,10 +27,11 @@ export function useClients(params?: { search?: string; page?: number }) {
 }
 
 export function useClient(id: number) {
+  const locationId = useActiveLocationId();
   return useQuery({
-    queryKey: ['clients', id],
-    queryFn: () => api.getClient(id),
-    enabled: !!id,
+    queryKey: ['clients', locationId, id],
+    queryFn: () => api.getClient(locationId!, id),
+    enabled: !!locationId && !!id,
   });
 }
 
