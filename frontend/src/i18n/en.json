@@ -84,10 +84,40 @@
     "status": {
       "scheduled": "Scheduled",
       "confirmed": "Confirmed",
+      "in_progress": "In progress",
       "completed": "Completed",
       "cancelled": "Cancelled",
       "no_show": "No show"
-    }
+    },
+    "confirm": "Confirm",
+    "start": "Start",
+    "complete": "Complete",
+    "no_show_action": "No-show",
+    "cancel_reason": "Cancellation reason",
+    "details": "Appointment details"
+  },
+  "notes": {
+    "add_note": "Add note",
+    "private": "Private",
+    "placeholder": "Write a note...",
+    "no_notes": "No notes yet",
+    "delete_confirm": "Are you sure you want to delete this note?"
+  },
+  "booking": {
+    "title": "Book Appointment Online",
+    "select_service": "Choose a treatment",
+    "select_datetime": "Choose date and time",
+    "your_details": "Your details",
+    "confirmation": "Confirmation",
+    "confirm_booking": "Confirm booking",
+    "success": "Booking confirmed!",
+    "success_message": "You will receive a confirmation email.",
+    "no_slots": "No available time slots",
+    "step": "Step",
+    "next": "Next",
+    "back": "Back",
+    "minutes": "min",
+    "from_price": "from"
   },
   "settings": {
     "title": "Settings",

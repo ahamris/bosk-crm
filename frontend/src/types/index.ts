@@ -84,7 +84,7 @@ export interface Appointment {
   location?: Location;
   starts_at: string;
   ends_at: string;
-  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
+  status: 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
   notes: string | null;
   price_cents: number;
   created_at: string;
@@ -142,6 +142,23 @@ export interface PaginatedResponse<T> {
     per_page: number;
     total: number;
   };
+}
+
+export interface ClientNote {
+  id: number;
+  client_id: number;
+  note: string;
+  is_private: boolean;
+  author?: User;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BookingSlot {
+  employee_id: number;
+  employee_name: string;
+  start: string;
+  end: string;
 }
 
 export interface ApiError {

@@ -84,10 +84,40 @@
     "status": {
       "scheduled": "Запланировано",
       "confirmed": "Подтверждено",
+      "in_progress": "В процессе",
       "completed": "Завершено",
       "cancelled": "Отменено",
       "no_show": "Не явился"
-    }
+    },
+    "confirm": "Подтвердить",
+    "start": "Начать",
+    "complete": "Завершить",
+    "no_show_action": "Неявка",
+    "cancel_reason": "Причина отмены",
+    "details": "Детали записи"
+  },
+  "notes": {
+    "add_note": "Добавить заметку",
+    "private": "Личное",
+    "placeholder": "Напишите заметку...",
+    "no_notes": "Пока нет заметок",
+    "delete_confirm": "Вы уверены, что хотите удалить эту заметку?"
+  },
+  "booking": {
+    "title": "Онлайн-запись",
+    "select_service": "Выберите процедуру",
+    "select_datetime": "Выберите дату и время",
+    "your_details": "Ваши данные",
+    "confirmation": "Подтверждение",
+    "confirm_booking": "Подтвердить запись",
+    "success": "Запись подтверждена!",
+    "success_message": "Вы получите подтверждение по электронной почте.",
+    "no_slots": "Нет свободного времени",
+    "step": "Шаг",
+    "next": "Далее",
+    "back": "Назад",
+    "minutes": "мин",
+    "from_price": "от"
   },
   "settings": {
     "title": "Настройки",

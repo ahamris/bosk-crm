@@ -5,6 +5,7 @@ import type {
   Service,
   ServiceCategory,
   Client,
+  ClientNote,
   Appointment,
   Employee,
   WorkingHour,
@@ -131,6 +132,21 @@ export async function updateClient(locationId: number, id: number, payload: Part
   return data.data ?? data;
 }
 
+// Client Notes
+export async function getClientNotes(locationId: number, clientId: number): Promise<ClientNote[]> {
+  const { data } = await api.get(`/locations/${locationId}/clients/${clientId}/notes`);
+  return data.data ?? data;
+}
+
+export async function createClientNote(locationId: number, clientId: number, payload: { note: string; is_private?: boolean }): Promise<ClientNote> {
+  const { data } = await api.post(`/locations/${locationId}/clients/${clientId}/notes`, payload);
+  return data.data ?? data;
+}
+
+export async function deleteClientNote(locationId: number, clientId: number, noteId: number): Promise<void> {
+  await api.delete(`/locations/${locationId}/clients/${clientId}/notes/${noteId}`);
+}
+
 // Appointments (location-scoped)
 export async function getAppointments(locationId: number, params?: {
   date?: string;
@@ -153,6 +169,30 @@ export async function updateAppointment(locationId: number, id: number, payload:
 
 export async function cancelAppointment(locationId: number, id: number): Promise<Appointment> {
   const { data } = await api.patch(`/locations/${locationId}/appointments/${id}/cancel`);
+  return data.data ?? data;
+}
+
+export async function transitionAppointment(locationId: number, appointmentId: number, payload: { status: string; cancellation_reason?: string }): Promise<Appointment> {
+  const { data } = await api.patch(`/locations/${locationId}/appointments/${appointmentId}/transition`, payload);
+  return data.data ?? data;
+}
+
+// Public Booking (no auth)
+export async function getBookingServices(locationId: number): Promise<Service[]> {
+  const { data } = await api.get(`/booking/${locationId}/services`);
+  return data.data ?? data;
+}
+
+export async function getBookingAvailability(locationId: number, params: { service_id: number; date: string; employee_id?: number }): Promise<{ slots: Array<{ time: string; employee_id: number; employee_name: string }> }> {
+  const { data } = await api.get(`/booking/${locationId}/availability`, { params });
+  return data;
+}
+
+export async function createBooking(locationId: number, payload: {
+  service_id: number; employee_id: number; date: string; time: string;
+  first_name: string; last_name: string; email: string; phone?: string; notes?: string;
+}): Promise<Appointment> {
+  const { data } = await api.post(`/booking/${locationId}/book`, payload);
   return data.data ?? data;
 }
 

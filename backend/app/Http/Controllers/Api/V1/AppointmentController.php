@@ -93,6 +93,33 @@ class AppointmentController extends Controller
         );
     }
 
+    public function transition(Request $request, Location $location, Appointment $appointment): AppointmentResource
+    {
+        $this->ensureBelongsToLocation($appointment, $location);
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:' . implode(',', Appointment::STATUSES),
+            'cancellation_reason' => 'nullable|string|max:500',
+        ]);
+
+        if (!$appointment->canTransitionTo($validated['status'])) {
+            abort(422, "Cannot transition from '{$appointment->status}' to '{$validated['status']}'.");
+        }
+
+        $data = ['status' => $validated['status']];
+
+        if ($validated['status'] === Appointment::STATUS_CANCELLED) {
+            $data['cancelled_at'] = now();
+            $data['cancellation_reason'] = $validated['cancellation_reason'] ?? null;
+        }
+
+        $appointment->update($data);
+
+        return new AppointmentResource(
+            $appointment->load(['client', 'employee', 'service'])
+        );
+    }
+
     public function destroy(Location $location, Appointment $appointment): JsonResponse
     {
         $this->ensureBelongsToLocation($appointment, $location);

@@ -58,6 +58,38 @@ export function useUpdateClient() {
   });
 }
 
+// Client Notes
+export function useClientNotes(clientId: number) {
+  const locationId = useLocationStore.getState().activeLocationId;
+  return useQuery({
+    queryKey: ['client-notes', locationId, clientId],
+    queryFn: () => api.getClientNotes(locationId!, clientId),
+    enabled: !!locationId && !!clientId,
+  });
+}
+
+export function useCreateClientNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ locationId, clientId, ...data }: { locationId: number; clientId: number; note: string; is_private?: boolean }) =>
+      api.createClientNote(locationId, clientId, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['client-notes', variables.locationId, variables.clientId] });
+    },
+  });
+}
+
+export function useDeleteClientNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ locationId, clientId, noteId }: { locationId: number; clientId: number; noteId: number }) =>
+      api.deleteClientNote(locationId, clientId, noteId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['client-notes', variables.locationId, variables.clientId] });
+    },
+  });
+}
+
 // Services
 export function useServices() {
   const locationId = useActiveLocationId();
@@ -156,6 +188,18 @@ export function useCancelAppointment() {
   const locationId = useActiveLocationId();
   return useMutation({
     mutationFn: (id: number) => api.cancelAppointment(locationId!, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+export function useTransitionAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ locationId, appointmentId, ...data }: { locationId: number; appointmentId: number; status: string; cancellation_reason?: string }) =>
+      api.transitionAppointment(locationId, appointmentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });

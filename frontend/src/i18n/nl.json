@@ -84,10 +84,40 @@
     "status": {
       "scheduled": "Gepland",
       "confirmed": "Bevestigd",
+      "in_progress": "Bezig",
       "completed": "Afgerond",
       "cancelled": "Geannuleerd",
       "no_show": "Niet verschenen"
-    }
+    },
+    "confirm": "Bevestigen",
+    "start": "Starten",
+    "complete": "Afronden",
+    "no_show_action": "Niet verschenen",
+    "cancel_reason": "Reden van annulering",
+    "details": "Afspraakdetails"
+  },
+  "notes": {
+    "add_note": "Notitie toevoegen",
+    "private": "Privé",
+    "placeholder": "Schrijf een notitie...",
+    "no_notes": "Nog geen notities",
+    "delete_confirm": "Weet je zeker dat je deze notitie wilt verwijderen?"
+  },
+  "booking": {
+    "title": "Online Afspraak Maken",
+    "select_service": "Kies een behandeling",
+    "select_datetime": "Kies datum en tijd",
+    "your_details": "Jouw gegevens",
+    "confirmation": "Bevestiging",
+    "confirm_booking": "Afspraak bevestigen",
+    "success": "Afspraak bevestigd!",
+    "success_message": "Je ontvangt een bevestiging per e-mail.",
+    "no_slots": "Geen beschikbare tijden",
+    "step": "Stap",
+    "next": "Volgende",
+    "back": "Terug",
+    "minutes": "min",
+    "from_price": "vanaf"
   },
   "settings": {
     "title": "Instellingen",

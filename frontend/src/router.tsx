@@ -15,6 +15,7 @@ import { ClientListPage } from './pages/clients/ClientListPage';
 import { ClientDetailPage } from './pages/clients/ClientDetailPage';
 import { ServiceListPage } from './pages/services/ServiceListPage';
 import { SettingsPage } from './pages/settings/SettingsPage';
+import { BookingPage } from './pages/booking/BookingPage';
 import { useAuthStore } from './stores/authStore';
 
 // Root route
@@ -94,8 +95,16 @@ const settingsRoute = createRoute({
   component: SettingsPage,
 });
 
+// Public booking route (no auth, no layout)
+const bookingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/booking/$locationId',
+  component: BookingPage,
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
+  bookingRoute,
   authLayoutRoute.addChildren([loginRoute, registerRoute]),
   appLayoutRoute.addChildren([
     dashboardRoute,
