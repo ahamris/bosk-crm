@@ -91,6 +91,40 @@ export function useDeleteClientNote() {
   });
 }
 
+// Communication Logs
+export function useCommunicationLogs(clientId: number) {
+  const locationId = useActiveLocationId();
+  return useQuery({
+    queryKey: ['communication-logs', locationId, clientId],
+    queryFn: () => api.getCommunicationLogs(locationId!, clientId),
+    enabled: !!locationId && !!clientId,
+  });
+}
+
+export function useCreateCommunicationLog() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      locationId,
+      clientId,
+      ...data
+    }: {
+      locationId: number;
+      clientId: number;
+      type: string;
+      direction: string;
+      subject?: string | null;
+      content?: string | null;
+      duration_seconds?: number | null;
+    }) => api.createCommunicationLog(locationId, clientId, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['communication-logs', variables.locationId, variables.clientId],
+      });
+    },
+  });
+}
+
 // Services
 export function useServices() {
   const locationId = useActiveLocationId();
@@ -290,10 +324,59 @@ export function useMarkInvoicePaid() {
 }
 
 // Employees
-export function useEmployees() {
+export function useEmployees(params?: { type?: string }) {
   return useQuery({
-    queryKey: ['employees'],
-    queryFn: api.getEmployees,
+    queryKey: ['employees', params],
+    queryFn: () => api.getEmployees(params),
+  });
+}
+
+export function useEmployee(id: number) {
+  return useQuery({
+    queryKey: ['employees', id],
+    queryFn: () => api.getEmployee(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateEmployee() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Record<string, unknown>) => api.createEmployee(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+    },
+  });
+}
+
+export function useUpdateEmployee() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }: { id: number } & Record<string, unknown>) =>
+      api.updateEmployee(id, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+      queryClient.invalidateQueries({ queryKey: ['employees', variables.id] });
+    },
+  });
+}
+
+export function useEmployeeWorkingHours(employeeId: number) {
+  return useQuery({
+    queryKey: ['employees', employeeId, 'working-hours'],
+    queryFn: () => api.getEmployeeWorkingHours(employeeId),
+    enabled: !!employeeId,
+  });
+}
+
+export function useBulkUpdateWorkingHours() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ employeeId, hours }: { employeeId: number; hours: Record<string, unknown>[] }) =>
+      api.bulkUpdateWorkingHours(employeeId, hours),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['employees', variables.employeeId, 'working-hours'] });
+    },
   });
 }
 

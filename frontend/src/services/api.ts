@@ -6,9 +6,11 @@ import type {
   ServiceCategory,
   Client,
   ClientNote,
+  CommunicationLog,
   Appointment,
   Employee,
   WorkingHour,
+  Review,
   DashboardResponse,
   PaginatedResponse,
   LoginCredentials,
@@ -147,6 +149,21 @@ export async function deleteClientNote(locationId: number, clientId: number, not
   await api.delete(`/locations/${locationId}/clients/${clientId}/notes/${noteId}`);
 }
 
+// Communication Logs
+export async function getCommunicationLogs(locationId: number, clientId: number): Promise<CommunicationLog[]> {
+  const { data } = await api.get(`/locations/${locationId}/clients/${clientId}/communication-logs`);
+  return data.data ?? data;
+}
+
+export async function createCommunicationLog(
+  locationId: number,
+  clientId: number,
+  payload: { type: string; direction: string; subject?: string | null; content?: string | null; duration_seconds?: number | null },
+): Promise<CommunicationLog> {
+  const { data } = await api.post(`/locations/${locationId}/clients/${clientId}/communication-logs`, payload);
+  return data.data ?? data;
+}
+
 // Appointments (location-scoped)
 export async function getAppointments(locationId: number, params?: {
   date?: string;
@@ -203,14 +220,40 @@ export async function getDashboard(): Promise<DashboardResponse> {
 }
 
 // Employees (not location-scoped)
-export async function getEmployees(): Promise<Employee[]> {
-  const { data } = await api.get('/employees');
+export async function getEmployees(params?: { type?: string }): Promise<Employee[]> {
+  const { data } = await api.get('/employees', { params });
+  return data.data ?? data;
+}
+
+export async function getEmployee(id: number): Promise<Employee> {
+  const { data } = await api.get(`/employees/${id}`);
+  return data.data ?? data;
+}
+
+export async function createEmployee(payload: Record<string, unknown>): Promise<Employee> {
+  const { data } = await api.post('/employees', payload);
+  return data.data ?? data;
+}
+
+export async function updateEmployee(id: number, payload: Record<string, unknown>): Promise<Employee> {
+  const { data } = await api.put(`/employees/${id}`, payload);
   return data.data ?? data;
 }
 
 export async function getEmployeeWorkingHours(employeeId: number): Promise<WorkingHour[]> {
   const { data } = await api.get(`/employees/${employeeId}/working-hours`);
   return data.data ?? data;
+}
+
+export async function bulkUpdateWorkingHours(employeeId: number, hours: Record<string, unknown>[]): Promise<{ message: string; hours: WorkingHour[] }> {
+  const { data } = await api.put(`/employees/${employeeId}/working-hours/bulk`, { hours });
+  return data;
+}
+
+export async function getEmployeeReviews(employeeId: number): Promise<Review[]> {
+  const { data } = await api.get(`/employees/${employeeId}`);
+  const employee = data.data ?? data;
+  return employee.reviews ?? [];
 }
 
 // Integrations

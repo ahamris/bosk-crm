@@ -9,18 +9,47 @@ import {
   FileText,
   Trash2,
   Lock,
+  Phone,
+  Mail,
+  MessageSquare,
+  MessageCircle,
+  StickyNote,
+  Footprints,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Plus,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { Select } from '../../components/ui/Select';
+import { Input } from '../../components/ui/Input';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { useClient, useAppointments, useClientNotes, useCreateClientNote, useDeleteClientNote } from '../../hooks/useApi';
+import {
+  useClient,
+  useAppointments,
+  useClientNotes,
+  useCreateClientNote,
+  useDeleteClientNote,
+  useCommunicationLogs,
+  useCreateCommunicationLog,
+} from '../../hooks/useApi';
 import { useLocationStore } from '../../stores/locationStore';
 import { localizedName } from '../../utils/locale';
 import clsx from 'clsx';
+import type { CommunicationLog } from '../../types';
 
-type Tab = 'info' | 'history' | 'notes';
+type Tab = 'info' | 'history' | 'notes' | 'communication';
+
+const commTypeIcons: Record<string, typeof Phone> = {
+  call: Phone,
+  email: Mail,
+  sms: MessageSquare,
+  whatsapp: MessageCircle,
+  note: StickyNote,
+  walk_in: Footprints,
+};
 
 export function ClientDetailPage() {
   const { t, i18n } = useTranslation();
@@ -36,10 +65,20 @@ export function ClientDetailPage() {
   const { data: notes = [], isLoading: notesLoading } = useClientNotes(clientId);
   const createNote = useCreateClientNote();
   const deleteNote = useDeleteClientNote();
+  const { data: commLogs = [], isLoading: commLogsLoading } = useCommunicationLogs(clientId);
+  const createCommLog = useCreateCommunicationLog();
 
   const [noteText, setNoteText] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [deletingNoteId, setDeletingNoteId] = useState<number | null>(null);
+
+  // Communication log form state
+  const [showCommForm, setShowCommForm] = useState(false);
+  const [commType, setCommType] = useState('call');
+  const [commDirection, setCommDirection] = useState('outgoing');
+  const [commSubject, setCommSubject] = useState('');
+  const [commContent, setCommContent] = useState('');
+  const [commDuration, setCommDuration] = useState('');
 
   const clientAppointments = appointments.filter(
     (a) => a.client_id === clientId
@@ -65,6 +104,25 @@ export function ClientDetailPage() {
     setDeletingNoteId(null);
   };
 
+  const handleAddCommLog = async () => {
+    if (!locationId) return;
+    await createCommLog.mutateAsync({
+      locationId,
+      clientId,
+      type: commType,
+      direction: commDirection,
+      subject: commSubject || null,
+      content: commContent || null,
+      duration_seconds: commDuration ? Math.round(parseFloat(commDuration) * 60) : null,
+    });
+    setShowCommForm(false);
+    setCommType('call');
+    setCommDirection('outgoing');
+    setCommSubject('');
+    setCommContent('');
+    setCommDuration('');
+  };
+
   if (isLoading || !client) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -77,7 +135,13 @@ export function ClientDetailPage() {
     { key: 'info', label: t('clients.personal_info') },
     { key: 'history', label: t('clients.visit_history') },
     { key: 'notes', label: t('clients.notes') },
+    { key: 'communication', label: t('clients.communication') },
   ];
+
+  function renderCommLogIcon(log: CommunicationLog) {
+    const Icon = commTypeIcons[log.type] ?? StickyNote;
+    return <Icon className="h-4 w-4 text-slate-500" />;
+  }
 
   return (
     <div className="space-y-6">
@@ -114,6 +178,14 @@ export function ClientDetailPage() {
                   <span>{client.phone}</span>
                 </div>
               )}
+              {(client.address || client.city) && (
+                <div className="flex items-center gap-2 text-slate-600">
+                  <span className="text-slate-400 text-xs">{t('clients.address')}</span>
+                  <span>
+                    {[client.address, client.postal_code, client.city].filter(Boolean).join(', ')}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-slate-600">
                 <Calendar className="h-4 w-4 text-slate-400" />
                 <span>{client.total_visits ?? 0} {t('clients.total_visits').toLowerCase()}</span>
@@ -124,13 +196,13 @@ export function ClientDetailPage() {
 
         {/* Right: tabs */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex gap-1 border-b border-slate-200">
+          <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={clsx(
-                  'px-4 py-2 text-sm font-medium border-b-2 transition-colors',
+                  'px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap',
                   activeTab === tab.key
                     ? 'border-primary-600 text-primary-700'
                     : 'border-transparent text-slate-500 hover:text-slate-700'
@@ -154,6 +226,9 @@ export function ClientDetailPage() {
                     {t('common.edit')}
                   </Button>
                 </div>
+
+                {/* Personal */}
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">{t('clients.section_personal')}</h3>
                 <InfoRow label={t('clients.first_name')} value={client.first_name} />
                 <InfoRow label={t('clients.last_name')} value={client.last_name} />
                 <InfoRow label={t('clients.email')} value={client.email || '-'} />
@@ -164,6 +239,39 @@ export function ClientDetailPage() {
                 />
                 <InfoRow label={t('clients.gender')} value={client.gender ? t(`clients.gender_${client.gender}`) : '-'} />
                 <InfoRow label={t('clients.locale')} value={client.locale ?? '-'} />
+
+                {/* Address */}
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide pt-2">{t('clients.section_address')}</h3>
+                <InfoRow label={t('clients.address')} value={client.address || '-'} />
+                <InfoRow label={t('clients.city')} value={client.city || '-'} />
+                <InfoRow label={t('clients.postal_code')} value={client.postal_code || '-'} />
+                <InfoRow label={t('clients.country')} value={client.country || '-'} />
+
+                {/* Preferences */}
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide pt-2">{t('clients.section_preferences')}</h3>
+                <InfoRow
+                  label={t('clients.preferred_contact')}
+                  value={client.preferred_contact ? t(`clients.preferred_contact_${client.preferred_contact}`) : '-'}
+                />
+                <InfoRow
+                  label={t('clients.source')}
+                  value={client.source ? t(`clients.source_${client.source}`) : '-'}
+                />
+                <InfoRow
+                  label={t('clients.marketing_consent')}
+                  value={client.marketing_consent ? t('common.yes') : t('common.no')}
+                />
+
+                {/* Medical */}
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide pt-2">{t('clients.section_medical')}</h3>
+                <InfoRow
+                  label={t('clients.skin_type')}
+                  value={client.skin_type ? t(`clients.skin_type_${client.skin_type}`) : '-'}
+                />
+                <InfoRow label={t('clients.medical_notes')} value={client.medical_notes || '-'} />
+
+                {/* Notes */}
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide pt-2">{t('clients.section_notes')}</h3>
                 <InfoRow label={t('clients.notes')} value={client.notes || '-'} />
               </div>
             )}
@@ -277,6 +385,149 @@ export function ClientDetailPage() {
                   <EmptyState
                     icon={<FileText className="h-12 w-12" />}
                     title={t('notes.no_notes')}
+                  />
+                )}
+              </div>
+            )}
+
+            {activeTab === 'communication' && (
+              <div className="space-y-4">
+                {/* Log communication button / form */}
+                {!showCommForm ? (
+                  <div className="flex justify-end">
+                    <Button size="sm" onClick={() => setShowCommForm(true)}>
+                      <Plus className="h-4 w-4" />
+                      {t('clients.log_communication')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-4">
+                    <h3 className="text-sm font-semibold text-slate-700">{t('clients.log_communication')}</h3>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <Select
+                        label={t('clients.comm_type')}
+                        value={commType}
+                        onChange={(e) => setCommType(e.target.value)}
+                        options={[
+                          { value: 'call', label: t('clients.comm_type_call') },
+                          { value: 'email', label: t('clients.comm_type_email') },
+                          { value: 'sms', label: t('clients.comm_type_sms') },
+                          { value: 'whatsapp', label: t('clients.comm_type_whatsapp') },
+                          { value: 'note', label: t('clients.comm_type_note') },
+                          { value: 'walk_in', label: t('clients.comm_type_walk_in') },
+                        ]}
+                      />
+                      <Select
+                        label={t('clients.comm_direction')}
+                        value={commDirection}
+                        onChange={(e) => setCommDirection(e.target.value)}
+                        options={[
+                          { value: 'incoming', label: t('clients.comm_direction_incoming') },
+                          { value: 'outgoing', label: t('clients.comm_direction_outgoing') },
+                        ]}
+                      />
+                    </div>
+                    <Input
+                      label={t('clients.comm_subject')}
+                      value={commSubject}
+                      onChange={(e) => setCommSubject(e.target.value)}
+                    />
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700">
+                        {t('clients.comm_content')}
+                      </label>
+                      <textarea
+                        value={commContent}
+                        onChange={(e) => setCommContent(e.target.value)}
+                        rows={3}
+                        className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      />
+                    </div>
+                    {commType === 'call' && (
+                      <Input
+                        label={t('clients.comm_duration')}
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={commDuration}
+                        onChange={(e) => setCommDuration(e.target.value)}
+                      />
+                    )}
+                    <div className="flex justify-end gap-3">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        type="button"
+                        onClick={() => setShowCommForm(false)}
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleAddCommLog}
+                        loading={createCommLog.isPending}
+                      >
+                        {t('common.save')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Communication log list */}
+                {commLogsLoading ? (
+                  <div className="flex justify-center py-6">
+                    <LoadingSpinner size="md" />
+                  </div>
+                ) : commLogs.length > 0 ? (
+                  <div className="divide-y divide-slate-100">
+                    {commLogs.map((log: CommunicationLog) => (
+                      <div key={log.id} className="py-3">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
+                            {renderCommLogIcon(log)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-medium text-slate-700">
+                                {t(`clients.comm_type_${log.type}`)}
+                              </span>
+                              {log.direction === 'incoming' ? (
+                                <ArrowDownLeft className="h-3 w-3 text-green-500" />
+                              ) : (
+                                <ArrowUpRight className="h-3 w-3 text-blue-500" />
+                              )}
+                              <span className="text-xs text-slate-400">
+                                {t(`clients.comm_direction_${log.direction}`)}
+                              </span>
+                              <span className="text-xs text-slate-400">
+                                {format(new Date(log.created_at), 'dd-MM-yyyy HH:mm')}
+                              </span>
+                              {log.user && (
+                                <span className="text-xs text-slate-400">
+                                  - {log.user.name}
+                                </span>
+                              )}
+                            </div>
+                            {log.subject && (
+                              <p className="text-sm font-medium text-slate-800">{log.subject}</p>
+                            )}
+                            {log.content && (
+                              <p className="text-sm text-slate-600 whitespace-pre-wrap">{log.content}</p>
+                            )}
+                            {log.duration_seconds != null && log.duration_seconds > 0 && (
+                              <p className="text-xs text-slate-400 mt-1">
+                                {t('clients.comm_duration')}: {Math.round(log.duration_seconds / 60)} min
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    icon={<MessageSquare className="h-12 w-12" />}
+                    title={t('clients.no_communication_logs')}
                   />
                 )}
               </div>

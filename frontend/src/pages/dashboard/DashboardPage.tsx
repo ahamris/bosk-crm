@@ -1,83 +1,45 @@
 import { useTranslation } from 'react-i18next';
-import { Calendar, Users, DollarSign, Clock } from 'lucide-react';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
-import { Card } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { EmptyState } from '../../components/ui/EmptyState';
+import {
+  StatCard,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Badge,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+  Button,
+  EmptyState,
+  Spinner,
+} from '../../ui';
 import { useDashboard } from '../../hooks/useApi';
 import { localizedName } from '../../utils/locale';
 import type { Appointment } from '../../types';
 
-function StatCard({
-  icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-  color: string;
-}) {
-  return (
-    <Card>
-      <div className="flex items-center gap-4">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${color}`}>
-          {icon}
-        </div>
-        <div>
-          <p className="text-sm text-slate-500">{label}</p>
-          <p className="text-2xl font-bold text-slate-900">{value}</p>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function AppointmentRow({ appointment }: { appointment: Appointment }) {
-  const { t, i18n } = useTranslation();
-  const serviceName = appointment.service
-    ? localizedName(appointment.service, i18n.language)
-    : '';
-  return (
-    <div className="flex items-center justify-between py-3">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-primary-700 text-sm font-medium">
-          {appointment.client?.first_name?.[0]}
-          {appointment.client?.last_name?.[0]}
-        </div>
-        <div>
-          <p className="text-sm font-medium text-slate-900">
-            {appointment.client?.full_name ?? `${appointment.client?.first_name ?? ''} ${appointment.client?.last_name ?? ''}`}
-          </p>
-          <p className="text-xs text-slate-500">{serviceName}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <div className="text-right">
-          <p className="text-sm text-slate-700">
-            {format(new Date(appointment.starts_at), 'HH:mm')} -{' '}
-            {format(new Date(appointment.ends_at), 'HH:mm')}
-          </p>
-          <p className="text-xs text-slate-500">{appointment.employee?.name}</p>
-        </div>
-        <Badge variant={appointment.status}>
-          {t(`appointments.status.${appointment.status}`)}
-        </Badge>
-      </div>
-    </div>
-  );
-}
+const statusColors: Record<string, 'blue' | 'green' | 'amber' | 'emerald' | 'red' | 'zinc' | 'purple'> = {
+  scheduled: 'blue',
+  confirmed: 'emerald',
+  in_progress: 'amber',
+  completed: 'green',
+  cancelled: 'red',
+  no_show: 'zinc',
+};
 
 export function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const { data: dashboard, isLoading } = useDashboard();
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <LoadingSpinner size="lg" />
+        <Spinner size="lg" label={t('common.loading')} />
       </div>
     );
   }
@@ -86,57 +48,198 @@ export function DashboardPage() {
   const totalClients = dashboard?.stats?.total_clients ?? 0;
   const revenueCents = dashboard?.stats?.revenue_today_cents ?? 0;
   const upcoming7Days = dashboard?.stats?.upcoming_7_days ?? 0;
-  const appointmentsToday = dashboard?.appointments_today ?? [];
+  const appointmentsToday: Appointment[] = dashboard?.appointments_today ?? [];
+
+  // Notification indicators
+  const unconfirmedCount = appointmentsToday.filter((a) => a.status === 'scheduled').length;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">{t('dashboard.title')}</h1>
+      <h1 className="text-2xl font-bold text-zinc-900">{t('dashboard.title')}</h1>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+      {/* ── Stat Cards ── */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<Calendar className="h-6 w-6 text-primary-600" />}
           label={t('dashboard.todays_appointments')}
           value={todaysTotal}
-          color="bg-primary-100"
+          icon="calendar-check"
+          color="bg-blue-50 text-blue-600"
+          href="/calendar"
         />
         <StatCard
-          icon={<Users className="h-6 w-6 text-blue-600" />}
           label={t('dashboard.total_clients')}
           value={totalClients}
-          color="bg-blue-100"
+          icon="users"
+          color="bg-indigo-50 text-indigo-600"
+          href="/clients"
         />
         <StatCard
-          icon={<DollarSign className="h-6 w-6 text-emerald-600" />}
           label={t('dashboard.revenue_today')}
-          value={`\u20AC${(revenueCents / 100).toFixed(2)}`}
-          color="bg-emerald-100"
+          value={`€${(revenueCents / 100).toFixed(2)}`}
+          icon="euro-sign"
+          color="bg-emerald-50 text-emerald-600"
         />
         <StatCard
-          icon={<Clock className="h-6 w-6 text-amber-600" />}
           label={t('dashboard.upcoming')}
           value={upcoming7Days}
-          color="bg-amber-100"
+          icon="calendar-days"
+          color="bg-amber-50 text-amber-600"
         />
       </div>
 
-      <Card>
-        <div className="mb-4 flex items-center gap-2">
-          <Clock className="h-5 w-5 text-slate-400" />
-          <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.upcoming')}</h2>
+      {/* ── Notification Banner ── */}
+      {unconfirmedCount > 0 && (
+        <div className="flex items-center gap-3 rounded-xl bg-amber-50 px-5 py-3 ring-1 ring-amber-200">
+          <i className="far fa-bell text-amber-600" />
+          <span className="text-sm font-medium text-amber-800">
+            {t('dashboard.unconfirmed_notice', {
+              count: unconfirmedCount,
+              defaultValue: `${unconfirmedCount} appointment(s) awaiting confirmation`,
+            })}
+          </span>
+          <Badge color="amber" size="sm">{unconfirmedCount}</Badge>
         </div>
-        {appointmentsToday.length > 0 ? (
-          <div className="divide-y divide-slate-100">
-            {appointmentsToday.map((apt) => (
-              <AppointmentRow key={apt.id} appointment={apt} />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={<Calendar className="h-12 w-12" />}
-            title={t('dashboard.no_appointments_today')}
-          />
-        )}
+      )}
+
+      {/* ── Today's Appointments ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle icon="calendar-day">{t('dashboard.todays_appointments')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {appointmentsToday.length > 0 ? (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeader>{t('appointments.time')}</TableHeader>
+                  <TableHeader>{t('appointments.client')}</TableHeader>
+                  <TableHeader>{t('appointments.service')}</TableHeader>
+                  <TableHeader>{t('appointments.employee')}</TableHeader>
+                  <TableHeader>{t('appointments.status_label')}</TableHeader>
+                  <TableHeader align="right">{t('common.actions')}</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {appointmentsToday.map((apt) => (
+                  <TableRow key={apt.id}>
+                    <TableCell>
+                      <span className="font-medium text-zinc-900">
+                        {format(new Date(apt.starts_at), 'HH:mm')}
+                      </span>
+                      <span className="text-zinc-400"> – </span>
+                      <span className="text-zinc-500">
+                        {format(new Date(apt.ends_at), 'HH:mm')}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {apt.client ? (
+                        <Link
+                          to="/clients/$id"
+                          params={{ id: String(apt.client_id) }}
+                          className="font-medium text-zinc-900 hover:text-blue-600 transition-colors"
+                        >
+                          {apt.client.full_name ?? `${apt.client.first_name} ${apt.client.last_name}`}
+                        </Link>
+                      ) : (
+                        <span className="text-zinc-400">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {apt.service ? localizedName(apt.service, i18n.language) : '—'}
+                    </TableCell>
+                    <TableCell>
+                      {apt.employee?.name ?? '—'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge color={statusColors[apt.status] ?? 'zinc'} dot>
+                        {t(`appointments.status.${apt.status}`)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        icon="eye"
+                        onClick={() => navigate({ to: '/calendar' })}
+                      >
+                        {t('common.view')}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <EmptyState
+              icon="calendar"
+              title={t('dashboard.no_appointments_today')}
+              description={t('dashboard.no_appointments_description', {
+                defaultValue: 'No appointments scheduled for today.',
+              })}
+            />
+          )}
+        </CardContent>
       </Card>
+
+      {/* ── Quick Actions ── */}
+      <div>
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900">{t('dashboard.quick_actions', { defaultValue: 'Quick Actions' })}</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <Link to="/calendar" className="block">
+            <Card hover>
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-blue-50 p-3 text-blue-600">
+                  <i className="far fa-calendar-plus text-lg" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900">
+                    {t('dashboard.new_appointment', { defaultValue: 'New Appointment' })}
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    {t('dashboard.new_appointment_desc', { defaultValue: 'Schedule a new appointment' })}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+
+          <Link to="/clients/new" className="block">
+            <Card hover>
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-emerald-50 p-3 text-emerald-600">
+                  <i className="far fa-user-plus text-lg" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900">
+                    {t('dashboard.add_client', { defaultValue: 'Add Client' })}
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    {t('dashboard.add_client_desc', { defaultValue: 'Register a new client' })}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+
+          <Link to="/services" className="block">
+            <Card hover>
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-purple-50 p-3 text-purple-600">
+                  <i className="far fa-list-check text-lg" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900">
+                    {t('dashboard.view_services', { defaultValue: 'View Services' })}
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    {t('dashboard.view_services_desc', { defaultValue: 'Manage your service catalog' })}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

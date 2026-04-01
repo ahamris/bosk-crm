@@ -20,6 +20,15 @@ const clientSchema = z.object({
   date_of_birth: z.string().optional(),
   gender: z.string().optional(),
   locale: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  postal_code: z.string().optional(),
+  country: z.string().optional(),
+  preferred_contact: z.string().optional(),
+  source: z.string().optional(),
+  medical_notes: z.string().optional(),
+  skin_type: z.string().optional(),
+  marketing_consent: z.boolean().optional(),
   notes: z.string().optional(),
 });
 
@@ -53,6 +62,15 @@ export function ClientEditPage() {
         date_of_birth: client.date_of_birth ?? '',
         gender: client.gender ?? '',
         locale: client.locale ?? '',
+        address: client.address ?? '',
+        city: client.city ?? '',
+        postal_code: client.postal_code ?? '',
+        country: client.country ?? 'NL',
+        preferred_contact: client.preferred_contact ?? 'email',
+        source: client.source ?? '',
+        medical_notes: client.medical_notes ?? '',
+        skin_type: client.skin_type ?? '',
+        marketing_consent: client.marketing_consent ?? false,
         notes: client.notes ?? '',
       });
     }
@@ -70,6 +88,28 @@ export function ClientEditPage() {
     { value: 'ru', label: 'Русский' },
   ];
 
+  const preferredContactOptions = [
+    { value: 'email', label: t('clients.preferred_contact_email') },
+    { value: 'phone', label: t('clients.preferred_contact_phone') },
+    { value: 'sms', label: t('clients.preferred_contact_sms') },
+    { value: 'whatsapp', label: t('clients.preferred_contact_whatsapp') },
+  ];
+
+  const sourceOptions = [
+    { value: 'walk_in', label: t('clients.source_walk_in') },
+    { value: 'website', label: t('clients.source_website') },
+    { value: 'referral', label: t('clients.source_referral') },
+    { value: 'social_media', label: t('clients.source_social_media') },
+  ];
+
+  const skinTypeOptions = [
+    { value: 'normal', label: t('clients.skin_type_normal') },
+    { value: 'dry', label: t('clients.skin_type_dry') },
+    { value: 'oily', label: t('clients.skin_type_oily') },
+    { value: 'combination', label: t('clients.skin_type_combination') },
+    { value: 'sensitive', label: t('clients.skin_type_sensitive') },
+  ];
+
   const onSubmit = async (formData: ClientForm) => {
     await updateClient.mutateAsync({
       id: clientId,
@@ -80,6 +120,15 @@ export function ClientEditPage() {
       date_of_birth: formData.date_of_birth || null,
       gender: formData.gender || null,
       locale: formData.locale || null,
+      address: formData.address || null,
+      city: formData.city || null,
+      postal_code: formData.postal_code || null,
+      country: formData.country || 'NL',
+      preferred_contact: (formData.preferred_contact || 'email') as 'email' | 'phone' | 'sms' | 'whatsapp',
+      source: formData.source || null,
+      medical_notes: formData.medical_notes || null,
+      skin_type: formData.skin_type || null,
+      marketing_consent: formData.marketing_consent ?? false,
       notes: formData.notes || null,
     });
     navigate({ to: '/clients/$id', params: { id } });
@@ -105,80 +154,168 @@ export function ClientEditPage() {
         </h1>
       </div>
 
-      <Card>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Input
-              label={t('clients.first_name')}
-              error={errors.first_name?.message}
-              {...register('first_name')}
-            />
-            <Input
-              label={t('clients.last_name')}
-              error={errors.last_name?.message}
-              {...register('last_name')}
-            />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Personal Info */}
+        <Card>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('clients.section_personal')}</h2>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input
+                label={t('clients.first_name')}
+                error={errors.first_name?.message}
+                {...register('first_name')}
+              />
+              <Input
+                label={t('clients.last_name')}
+                error={errors.last_name?.message}
+                {...register('last_name')}
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input
+                label={t('clients.email')}
+                type="email"
+                error={errors.email?.message}
+                {...register('email')}
+              />
+              <Input
+                label={t('clients.phone')}
+                type="tel"
+                error={errors.phone?.message}
+                {...register('phone')}
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <Input
+                label={t('clients.date_of_birth')}
+                type="date"
+                error={errors.date_of_birth?.message}
+                {...register('date_of_birth')}
+              />
+              <Select
+                label={t('clients.gender')}
+                options={genderOptions}
+                placeholder="-"
+                error={errors.gender?.message}
+                {...register('gender')}
+              />
+              <Select
+                label={t('clients.locale')}
+                options={localeOptions}
+                placeholder="-"
+                error={errors.locale?.message}
+                {...register('locale')}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        </Card>
+
+        {/* Address */}
+        <Card>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('clients.section_address')}</h2>
+          <div className="space-y-4">
             <Input
-              label={t('clients.email')}
-              type="email"
-              error={errors.email?.message}
-              {...register('email')}
+              label={t('clients.address')}
+              error={errors.address?.message}
+              {...register('address')}
             />
-            <Input
-              label={t('clients.phone')}
-              type="tel"
-              error={errors.phone?.message}
-              {...register('phone')}
-            />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <Input
+                label={t('clients.city')}
+                error={errors.city?.message}
+                {...register('city')}
+              />
+              <Input
+                label={t('clients.postal_code')}
+                error={errors.postal_code?.message}
+                {...register('postal_code')}
+              />
+              <Input
+                label={t('clients.country')}
+                error={errors.country?.message}
+                {...register('country')}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Input
-              label={t('clients.date_of_birth')}
-              type="date"
-              error={errors.date_of_birth?.message}
-              {...register('date_of_birth')}
-            />
-            <Select
-              label={t('clients.gender')}
-              options={genderOptions}
-              placeholder="-"
-              error={errors.gender?.message}
-              {...register('gender')}
-            />
-            <Select
-              label={t('clients.locale')}
-              options={localeOptions}
-              placeholder="-"
-              error={errors.locale?.message}
-              {...register('locale')}
-            />
-          </div>
-          <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-slate-700">
-              {t('clients.notes')}
+        </Card>
+
+        {/* Preferences */}
+        <Card>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('clients.section_preferences')}</h2>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Select
+                label={t('clients.preferred_contact')}
+                options={preferredContactOptions}
+                error={errors.preferred_contact?.message}
+                {...register('preferred_contact')}
+              />
+              <Select
+                label={t('clients.source')}
+                options={sourceOptions}
+                placeholder="-"
+                error={errors.source?.message}
+                {...register('source')}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+              <input
+                type="checkbox"
+                className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                {...register('marketing_consent')}
+              />
+              {t('clients.marketing_consent')}
             </label>
+          </div>
+        </Card>
+
+        {/* Medical */}
+        <Card>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('clients.section_medical')}</h2>
+          <div className="space-y-4">
+            <Select
+              label={t('clients.skin_type')}
+              options={skinTypeOptions}
+              placeholder="-"
+              error={errors.skin_type?.message}
+              {...register('skin_type')}
+            />
+            <div>
+              <label htmlFor="medical_notes" className="block text-sm font-medium text-slate-700">
+                {t('clients.medical_notes')}
+              </label>
+              <textarea
+                id="medical_notes"
+                rows={3}
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                {...register('medical_notes')}
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Notes */}
+        <Card>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('clients.section_notes')}</h2>
+          <div>
             <textarea
               id="notes"
               rows={3}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               {...register('notes')}
             />
-            {errors.notes?.message && (
-              <p className="mt-1 text-sm text-red-600">{errors.notes.message}</p>
-            )}
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" type="button" onClick={() => navigate({ to: '/clients/$id', params: { id } })}>
-              {t('common.cancel')}
-            </Button>
-            <Button type="submit" loading={updateClient.isPending}>
-              {t('common.save')}
-            </Button>
-          </div>
-        </form>
-      </Card>
+        </Card>
+
+        <div className="flex justify-end gap-3">
+          <Button variant="secondary" type="button" onClick={() => navigate({ to: '/clients/$id', params: { id } })}>
+            {t('common.cancel')}
+          </Button>
+          <Button type="submit" loading={updateClient.isPending}>
+            {t('common.save')}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

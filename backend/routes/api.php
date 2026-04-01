@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\ClientNoteController;
+use App\Http\Controllers\Api\V1\CommunicationLogController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\EmployeeController;
 use App\Http\Controllers\Api\V1\LocationController;
@@ -59,15 +60,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('locations/{location}/clients/{client}/notes', [ClientNoteController::class, 'store']);
     Route::delete('locations/{location}/clients/{client}/notes/{clientNote}', [ClientNoteController::class, 'destroy']);
 
+    // Communication logs
+    Route::get('locations/{location}/clients/{client}/communication-logs', [CommunicationLogController::class, 'index']);
+    Route::post('locations/{location}/clients/{client}/communication-logs', [CommunicationLogController::class, 'store']);
+
     // Service categories (global)
     Route::apiResource('service-categories', ServiceCategoryController::class);
 
     // Employees
     Route::get('employees', [EmployeeController::class, 'index']);
+    Route::post('employees', [EmployeeController::class, 'store']);
     Route::get('employees/{employee}', [EmployeeController::class, 'show']);
+    Route::put('employees/{employee}', [EmployeeController::class, 'update']);
     Route::get('employees/{employee}/availability', [EmployeeController::class, 'availability']);
 
-    // Working hours per employee
+    // Working hours per employee (bulk MUST come before apiResource to avoid {workingHour} conflict)
+    Route::put('employees/{employee}/working-hours/bulk', [WorkingHourController::class, 'bulkUpdate']);
     Route::apiResource('employees.working-hours', WorkingHourController::class)
         ->parameters(['working-hours' => 'workingHour']);
 

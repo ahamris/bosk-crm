@@ -22,6 +22,10 @@ import { ServiceEditPage } from './pages/services/ServiceEditPage';
 import { SettingsPage } from './pages/settings/SettingsPage';
 import { IntegrationsPage } from './pages/settings/IntegrationsPage';
 import { InvoicesPage } from './pages/invoices/InvoicesPage';
+import { EmployeeListPage } from './pages/employees/EmployeeListPage';
+import { EmployeeCreatePage } from './pages/employees/EmployeeCreatePage';
+import { EmployeeDetailPage } from './pages/employees/EmployeeDetailPage';
+import { EmployeeEditPage } from './pages/employees/EmployeeEditPage';
 import { AiAssistantPage } from './pages/ai/AiAssistantPage';
 import { BookingPage } from './pages/booking/BookingPage';
 import { useAuthStore } from './stores/authStore';
@@ -127,6 +131,30 @@ const serviceEditRoute = createRoute({
   component: ServiceEditPage,
 });
 
+const employeeListRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/employees',
+  component: EmployeeListPage,
+});
+
+const employeeCreateRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/employees/new',
+  component: EmployeeCreatePage,
+});
+
+const employeeDetailRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/employees/$id',
+  component: EmployeeDetailPage,
+});
+
+const employeeEditRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/employees/$id/edit',
+  component: EmployeeEditPage,
+});
+
 const settingsRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/settings',
@@ -173,6 +201,10 @@ const routeTree = rootRoute.addChildren([
     serviceDetailRoute,
     serviceEditRoute,
     serviceListRoute,
+    employeeListRoute,
+    employeeCreateRoute,
+    employeeDetailRoute,
+    employeeEditRoute,
     settingsRoute,
     integrationsRoute,
     invoicesRoute,

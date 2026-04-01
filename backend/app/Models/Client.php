@@ -19,9 +19,18 @@ class Client extends Model
         'last_name',
         'email',
         'phone',
+        'address',
+        'city',
+        'postal_code',
+        'country',
+        'preferred_contact',
+        'source',
         'date_of_birth',
         'gender',
         'notes',
+        'medical_notes',
+        'skin_type',
+        'marketing_consent',
         'locale',
         'is_active',
         'moneybird_contact_id',
@@ -32,6 +41,7 @@ class Client extends Model
         return [
             'date_of_birth' => 'date',
             'is_active' => 'boolean',
+            'marketing_consent' => 'boolean',
         ];
     }
 
@@ -53,6 +63,11 @@ class Client extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function communicationLogs(): HasMany
+    {
+        return $this->hasMany(CommunicationLog::class);
     }
 
     public function getFullNameAttribute(): string

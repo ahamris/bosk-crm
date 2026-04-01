@@ -60,14 +60,37 @@ export interface Client {
   full_name: string;
   email: string | null;
   phone: string | null;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  country: string;
+  preferred_contact: 'email' | 'phone' | 'sms' | 'whatsapp';
+  source: string | null;
   date_of_birth: string | null;
   gender: string | null;
   locale: string | null;
   is_active: boolean;
   notes: string | null;
+  medical_notes: string | null;
+  skin_type: string | null;
+  marketing_consent: boolean;
   avatar_url: string | null;
   total_visits: number;
   last_visit_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommunicationLog {
+  id: number;
+  client_id: number;
+  user_id: number;
+  user?: User;
+  type: 'call' | 'email' | 'sms' | 'whatsapp' | 'note' | 'walk_in';
+  direction: 'incoming' | 'outgoing';
+  subject: string | null;
+  content: string | null;
+  duration_seconds: number | null;
   created_at: string;
   updated_at: string;
 }
