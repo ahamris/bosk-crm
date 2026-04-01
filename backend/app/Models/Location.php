@@ -59,6 +59,11 @@ class Location extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

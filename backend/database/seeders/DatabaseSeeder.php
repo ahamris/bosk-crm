@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\ClientNote;
 use App\Models\EmployeeProfile;
 use App\Models\Location;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\User;
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Admin Beheerder',
                 'password' => bcrypt('password'),
+                'type' => 'staff',
             ]
         );
         $admin->assignRole('owner');
@@ -107,9 +109,10 @@ class DatabaseSeeder extends Seeder
 
         // ── Employees ──────────────────────────────────────────
         $employees = [
-            ['name' => 'Sophie de Vries', 'email' => 'sophie@bosk.nl', 'bio_nl' => 'Huidtherapeut met 8 jaar ervaring', 'specializations' => ['huidbehandelingen', 'gezichtsbehandeling']],
-            ['name' => 'Elena Petrova', 'email' => 'elena@bosk.nl', 'bio_nl' => 'Specialist in lichaamsmassage en scrubs', 'specializations' => ['lichaam', 'overig']],
-            ['name' => 'Lisa Jansen', 'email' => 'lisa@bosk.nl', 'bio_nl' => 'Nagelstyliste en wimperspecialist', 'specializations' => ['nagels', 'overig']],
+            ['name' => 'Sophie de Vries', 'email' => 'sophie@bosk.nl', 'bio_nl' => 'Huidtherapeut met 8 jaar ervaring', 'specializations' => ['huidbehandelingen', 'gezichtsbehandeling'], 'type' => 'staff'],
+            ['name' => 'Elena Petrova', 'email' => 'elena@bosk.nl', 'bio_nl' => 'Specialist in lichaamsmassage en scrubs', 'specializations' => ['lichaam', 'overig'], 'type' => 'staff'],
+            ['name' => 'Lisa Jansen', 'email' => 'lisa@bosk.nl', 'bio_nl' => 'Nagelstyliste en wimperspecialist', 'specializations' => ['nagels', 'overig'], 'type' => 'staff'],
+            ['name' => 'Daria Kuznetsova', 'email' => 'daria@bosk.nl', 'bio_nl' => 'Freelance huidtherapeut, gespecialiseerd in gezichtsbehandelingen', 'specializations' => ['gezichtsbehandeling', 'huidbehandelingen'], 'type' => 'freelancer'],
         ];
 
         $employeeModels = [];
@@ -119,6 +122,7 @@ class DatabaseSeeder extends Seeder
                 [
                     'name' => $emp['name'],
                     'password' => bcrypt('password'),
+                    'type' => $emp['type'],
                 ],
             );
             $user->assignRole('employee');
@@ -242,6 +246,36 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $employeeModels[$note['employee_idx']]->id,
                 'note' => $note['note'],
                 'is_private' => $note['is_private'],
+            ]);
+        }
+
+        // ── Reviews ────────────────────────────────────────────
+        $reviews = [
+            ['client_idx' => 0, 'employee_idx' => 0, 'rating' => 5, 'comment' => 'Fantastische behandeling! Sophie nam de tijd om alles uit te leggen en het resultaat is geweldig.', 'is_published' => true],
+            ['client_idx' => 1, 'employee_idx' => 0, 'rating' => 4, 'comment' => 'Heel professioneel en vriendelijk. De Hydrafacial voelde heerlijk aan.', 'is_published' => true],
+            ['client_idx' => 2, 'employee_idx' => 0, 'rating' => 5, 'comment' => 'Na drie sessies microneedling zie ik echt verschil. Zeer tevreden!', 'is_published' => true],
+            ['client_idx' => 5, 'employee_idx' => 0, 'rating' => 4, 'comment' => 'Goede ervaring met laser ontharing. Resultaat is duidelijk zichtbaar.', 'is_published' => true],
+            ['client_idx' => 8, 'employee_idx' => 0, 'rating' => 3, 'comment' => 'Behandeling was prima, maar de wachttijd was langer dan verwacht.', 'is_published' => true],
+            ['client_idx' => 5, 'employee_idx' => 1, 'rating' => 5, 'comment' => 'Elena is een topper! De lichaamsmassage was precies wat ik nodig had.', 'is_published' => true],
+            ['client_idx' => 6, 'employee_idx' => 1, 'rating' => 4, 'comment' => 'Fijne behandeling, rustige sfeer. Kom zeker terug voor de volgende sessie.', 'is_published' => true],
+            ['client_idx' => 9, 'employee_idx' => 1, 'rating' => 5, 'comment' => 'Heel blij met de lichaamspeeling. Mijn huid voelt zo zacht aan!', 'is_published' => true],
+            ['client_idx' => 4, 'employee_idx' => 1, 'rating' => 4, 'comment' => 'Отличный массаж, очень расслабляющий. Елена настоящий профессионал.', 'is_published' => true],
+            ['client_idx' => 7, 'employee_idx' => 2, 'rating' => 5, 'comment' => 'Lisa is heel kundig met de acnebehandeling. Mijn huid is veel rustiger geworden.', 'is_published' => true],
+            ['client_idx' => 3, 'employee_idx' => 2, 'rating' => 4, 'comment' => 'Prettige sfeer en goed advies voor thuisverzorging. Aanrader!', 'is_published' => true],
+            ['client_idx' => 1, 'employee_idx' => 3, 'rating' => 5, 'comment' => 'Daria is heel vakkundig. De gezichtsbehandeling was heerlijk ontspannend.', 'is_published' => true],
+            ['client_idx' => 2, 'employee_idx' => 3, 'rating' => 4, 'comment' => 'Mooie resultaten na de chemische peeling. Goed nabehandeld.', 'is_published' => true],
+            ['client_idx' => 6, 'employee_idx' => 0, 'rating' => 5, 'comment' => 'Tweede keer bij Sophie en weer top! Ze onthoudt precies wat je huid nodig heeft.', 'is_published' => false],
+            ['client_idx' => 3, 'employee_idx' => 1, 'rating' => 3, 'comment' => 'Behandeling was oké, maar ik verwachtte iets meer uitleg over het proces.', 'is_published' => false],
+        ];
+
+        foreach ($reviews as $rev) {
+            Review::create([
+                'location_id' => $location->id,
+                'client_id' => $clientModels[$rev['client_idx']]->id,
+                'employee_user_id' => $employeeModels[$rev['employee_idx']]->id,
+                'rating' => $rev['rating'],
+                'comment' => $rev['comment'],
+                'is_published' => $rev['is_published'],
             ]);
         }
     }

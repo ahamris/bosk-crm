@@ -37,8 +37,14 @@
     "title": "Calendar",
     "today": "Today",
     "week": "Week",
+    "list": "List",
+    "kanban": "Board",
     "new_appointment": "New appointment",
-    "no_appointments": "No appointments"
+    "no_appointments": "No appointments",
+    "scheduled": "Scheduled",
+    "confirmed": "Confirmed",
+    "in_progress": "In Progress",
+    "completed_col": "Completed"
   },
   "clients": {
     "title": "Clients",

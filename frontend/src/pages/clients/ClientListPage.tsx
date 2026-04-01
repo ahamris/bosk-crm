@@ -1,62 +1,23 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@tanstack/react-router';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Plus, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Input } from '../../components/ui/Input';
-import { Modal } from '../../components/ui/Modal';
 import { Table } from '../../components/ui/Table';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { useClients, useCreateClient } from '../../hooks/useApi';
+import { useClients } from '../../hooks/useApi';
 import type { Client } from '../../types';
-
-const clientSchema = z.object({
-  first_name: z.string().min(1),
-  last_name: z.string().min(1),
-  email: z.string().email().or(z.literal('')).optional(),
-  phone: z.string().optional(),
-  date_of_birth: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-type ClientForm = z.infer<typeof clientSchema>;
 
 export function ClientListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [modalOpen, setModalOpen] = useState(false);
 
   const { data, isLoading } = useClients({ search: search || undefined });
-  const createClient = useCreateClient();
   const clients = data?.data ?? [];
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ClientForm>({
-    resolver: zodResolver(clientSchema),
-  });
-
-  const onSubmit = async (formData: ClientForm) => {
-    await createClient.mutateAsync({
-      ...formData,
-      email: formData.email || null,
-      phone: formData.phone || null,
-      date_of_birth: formData.date_of_birth || null,
-      notes: formData.notes || null,
-    });
-    setModalOpen(false);
-    reset();
-  };
 
   const columns = [
     {
@@ -94,7 +55,7 @@ export function ClientListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">{t('clients.title')}</h1>
-        <Button onClick={() => setModalOpen(true)}>
+        <Button onClick={() => navigate({ to: '/clients/new' })}>
           <Plus className="h-4 w-4" />
           {t('clients.add_client')}
         </Button>
@@ -123,7 +84,7 @@ export function ClientListPage() {
             title={t('clients.no_clients')}
             description={t('clients.no_clients_desc')}
             action={
-              <Button onClick={() => setModalOpen(true)}>
+              <Button onClick={() => navigate({ to: '/clients/new' })}>
                 <Plus className="h-4 w-4" />
                 {t('clients.add_client')}
               </Button>
@@ -138,54 +99,6 @@ export function ClientListPage() {
           />
         )}
       </Card>
-
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={t('clients.add_client')}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('clients.first_name')}
-              error={errors.first_name?.message}
-              {...register('first_name')}
-            />
-            <Input
-              label={t('clients.last_name')}
-              error={errors.last_name?.message}
-              {...register('last_name')}
-            />
-          </div>
-          <Input
-            label={t('clients.email')}
-            type="email"
-            error={errors.email?.message}
-            {...register('email')}
-          />
-          <Input
-            label={t('clients.phone')}
-            type="tel"
-            error={errors.phone?.message}
-            {...register('phone')}
-          />
-          <Input
-            label={t('clients.date_of_birth')}
-            type="date"
-            error={errors.date_of_birth?.message}
-            {...register('date_of_birth')}
-          />
-          <Input
-            label={t('clients.notes')}
-            error={errors.notes?.message}
-            {...register('notes')}
-          />
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" type="button" onClick={() => setModalOpen(false)}>
-              {t('common.cancel')}
-            </Button>
-            <Button type="submit" loading={createClient.isPending}>
-              {t('common.save')}
-            </Button>
-          </div>
-        </form>
-      </Modal>
     </div>
   );
 }

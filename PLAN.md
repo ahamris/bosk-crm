@@ -3,326 +3,247 @@
 ## Project Overview
 
 **Client**: BOSK — Schoonheidssalon & Huidkliniek, Gouda
-**Type**: SaaS CRM — appointment scheduling, POS, client management, marketing
+**Type**: SaaS CRM — appointment scheduling, client management, invoicing via Moneybird
 **Languages**: Nederlands (primary), English, Русский (Russian)
-**Inspired by**: [Salonized](https://www.salonized.com/en/features) — feature parity + clinic-specific additions
+**Inspired by**: [Salonized](https://www.salonized.com/en/features)
 
 ## Tech Stack
 
 | Component       | Technology                                          |
 |-----------------|-----------------------------------------------------|
-| Backend         | Laravel 13, PHP 8.4 (API-first, geen Blade)         |
-| Frontend        | React 19 + Vite + TypeScript                        |
-| UI Kit          | @opencivics/ui (Catalyst + Tailwind)                |
+| Backend         | Laravel 13, PHP 8.4 (API-first)                     |
+| Frontend        | React 19 + Vite + TypeScript + Tailwind CSS v4      |
 | Database        | PostgreSQL 16                                       |
 | Cache/Queue     | Redis 7                                             |
 | Search          | Typesense 27.1 (via Laravel Scout)                  |
 | Auth            | Laravel Sanctum + Spatie Permissions (RBAC)          |
-| i18n            | Backend: Laravel Lang, Frontend: react-i18next       |
+| i18n            | Laravel Lang + react-i18next                         |
+| Invoicing       | Moneybird (native API integration)                   |
 | API Docs        | OpenAPI 3.1 (dedoc/scramble)                         |
-| Payments        | Mollie (iDEAL, cards, Apple/Google Pay)              |
-| SMS/Email       | Resend (email) + MessageBird (SMS)                   |
-| Calendar Sync   | Google Calendar API (two-way)                        |
-| Monitoring      | Laravel Pulse + Horizon                              |
 
 ## Infrastructure
 
 | Parameter       | Value                                               |
 |-----------------|-----------------------------------------------------|
 | Host            | Proxmox homelab (`172.24.0.251`)                    |
-| VMID            | **300**                                             |
-| Hostname        | `bosk-crm`                                          |
+| VMID            | **300** (`bosk-crm`)                                |
 | IP              | `172.24.0.30`                                       |
 | OS              | Ubuntu 24.04 LTS                                    |
 | Resources       | 4 cores, 4GB RAM, 2GB swap, 32GB ZFS                |
-| Storage         | `zfs-pve-01`                                        |
 
 ---
 
-## Feature Roadmap
+## UX Design Principles
 
-### Phase 1 — Foundation (Sprint 1-2)
+> These rules apply to ALL pages. No exceptions.
 
-#### 1.1 Authentication & Multi-tenancy
-- [ ] Sanctum API auth (login, register, forgot password)
-- [ ] RBAC: Owner, Manager, Employee, Receptionist
-- [ ] Multi-location support (single account, multiple salons)
-- [ ] 2FA (TOTP)
-- [ ] User activity audit log (Spatie Activitylog)
+### 1. No Popups for CRUD
+- **Modals/popups** are ONLY for confirmations, alerts, and notifications
+- **SlidePanel** (slides in from the right) for quick create/edit forms
+- **Full pages** for detailed create/edit/view with all fields
 
-#### 1.2 i18n — Trilingual Support
-- [ ] Laravel Lang + JSON translation files (nl, en, ru)
-- [ ] react-i18next with namespace-per-module
-- [ ] Language switcher in UI (flag selector)
-- [ ] RTL-ready layout (future-proof)
-- [ ] Locale-aware date/time/currency formatting
+### 2. Navigation Patterns
+| Action       | UI Pattern                                     |
+|-------------|------------------------------------------------|
+| Quick create | SlidePanel (right side, 400px)                |
+| Quick edit   | SlidePanel (right side, 400px)                |
+| Full create  | Dedicated page `/services/new`                |
+| Full edit    | Dedicated page `/services/:id/edit`           |
+| View detail  | Dedicated page `/services/:id`                |
+| Delete       | Confirmation dialog (modal OK here)           |
+| Status change| Inline button / SlidePanel                    |
 
-#### 1.3 Staff Management
-- [ ] Employee profiles (name, photo, bio, specializations)
-- [ ] Working hours & availability per employee
-- [ ] Multi-location scheduling (employee works at multiple locations)
-- [ ] Role-based calendar views (restrict what employees see)
-- [ ] Employee performance dashboard (revenue, clients, hours)
+### 3. Calendar Views
+The calendar supports 3 views, switchable via tabs:
+- **Week view** — Traditional time grid (columns = days, rows = hours)
+- **List view** — Chronological list of appointments for selected date/range
+- **Kanban view** — Columns by status (Scheduled → Confirmed → In Progress → Completed)
 
----
-
-### Phase 2 — Core Scheduling (Sprint 3-4)
-
-#### 2.1 Service Catalog
-- [ ] Services CRUD (name, duration, price, category, description)
-- [ ] Service categories (Skin treatments, Beauty, Wellness, etc.)
-- [ ] Processing & buffer time per service
-- [ ] Room/equipment requirements per service
-- [ ] Service availability rules (days, times, booking limits)
-- [ ] Trilingual service descriptions
-
-#### 2.2 Online Calendar
-- [ ] Drag-and-drop calendar (day/week/employee/room views)
-- [ ] Double-booking prevention
-- [ ] Recurring appointments
-- [ ] Google Calendar two-way sync
-- [ ] Calendar sharing (iCal export)
-- [ ] Color-coded by service type / employee
-- [ ] Calendar preview toggle while booking
-
-#### 2.3 Online Booking Widget
-- [ ] Embeddable booking widget (iframe + JS snippet)
-- [ ] 24/7 self-service booking
-- [ ] Service → employee → date/time flow
-- [ ] Automatic confirmation emails (trilingual)
-- [ ] Online rescheduling & cancellation
-- [ ] Booking terms checkbox
-- [ ] Client notes during booking
-- [ ] Employee availability view (next available dates)
-- [ ] Reserve with Google integration
+### 4. Component Architecture
+```
+src/components/
+├── ui/                    # Atomic UI components
+│   ├── Button.tsx
+│   ├── Input.tsx
+│   ├── Select.tsx
+│   ├── Badge.tsx
+│   ├── Card.tsx
+│   ├── Table.tsx
+│   ├── SlidePanel.tsx     # Right-side panel for quick edits
+│   ├── ConfirmDialog.tsx  # Only modal — for delete/destructive actions
+│   ├── LoadingSpinner.tsx
+│   ├── EmptyState.tsx
+│   └── LanguageSwitcher.tsx
+├── layout/
+│   ├── AppLayout.tsx
+│   ├── AuthLayout.tsx
+│   ├── Header.tsx
+│   └── Sidebar.tsx
+```
 
 ---
 
-### Phase 3 — Client Management (Sprint 5-6)
+## Data Model
 
-#### 3.1 CRM / Client Profiles
-- [ ] Client database with Typesense search (name, email, phone)
-- [ ] Visit history & payment history timeline
-- [ ] Before/after photo gallery per client
-- [ ] Consultation notes per visit
-- [ ] Client tags & segments (VIP, new, inactive, etc.)
-- [ ] Client activity log
-- [ ] GDPR data export & deletion
+### Users & Roles
+```
+users (id, name, email, password, type: 'staff'|'freelancer')
+  → RBAC roles: owner, manager, employee, receptionist, freelancer
+  → employee_profiles (bio, specializations, avatar, is_active)
+  → working_hours (per location, per day)
+```
 
-#### 3.2 Digital Forms
-- [ ] Intake/consultation form builder (drag-and-drop)
-- [ ] Pre-appointment form sending (email link)
-- [ ] Medical history forms (skin clinic specific)
-- [ ] Consent forms with digital signature
-- [ ] Allergy & contraindication tracking
-- [ ] Form templates library (trilingual)
+### Staff vs Freelancers
+| Field          | Staff Employee           | Freelancer                    |
+|---------------|--------------------------|-------------------------------|
+| Type          | `staff`                   | `freelancer`                  |
+| Schedule      | Fixed working hours       | Sets own availability         |
+| Pay           | Salary (external)         | Per-appointment commission     |
+| Locations     | Assigned by manager       | Chooses where to work         |
+| Dashboard     | Sees own appointments     | Sees own + can accept/decline |
 
-#### 3.3 Communication
-- [ ] Automated appointment reminders (email + SMS)
-- [ ] Customizable reminder timing (24h, 2h before)
-- [ ] Birthday messages (auto-send)
-- [ ] Post-appointment feedback requests
-- [ ] Two-way SMS (future)
-
----
-
-### Phase 4 — Sales & Inventory (Sprint 7-8)
-
-#### 4.1 Point of Sale (POS)
-- [ ] Digital cash register
-- [ ] Service + product checkout in one transaction
-- [ ] Mollie payment integration (iDEAL, cards, contactless)
-- [ ] Automated invoices & digital receipts (trilingual)
-- [ ] Daily income tracking & end-of-day reconciliation
-- [ ] Barcode scanner support
-- [ ] Tip handling
-- [ ] Split payments
-
-#### 4.2 Gift Cards & Prepaid
-- [ ] Gift voucher creation & redemption
-- [ ] Online gift card sales widget
-- [ ] Prepaid/credit cards (buy €100, get €110)
-- [ ] Voucher balance tracking
-- [ ] Expiration management
-
-#### 4.3 Inventory Management
-- [ ] Product catalog (brands, categories, SKUs)
-- [ ] Stock tracking (min/max thresholds)
-- [ ] Automated reorder suggestions
-- [ ] Supplier management & email ordering
-- [ ] Product sales per employee reporting
-- [ ] Stock value reporting
+### Reviews
+```
+reviews (id, client_id, appointment_id, employee_user_id, rating 1-5, 
+         comment, is_published, created_at)
+```
+- Clients leave reviews after completed appointments
+- Auto-request via email (future)
+- Published reviews visible on booking widget + employee profile
+- Average rating shown on employee cards
 
 ---
 
-### Phase 5 — Marketing & Loyalty (Sprint 9-10)
+## Route Structure
 
-#### 5.1 Loyalty Program
-- [ ] Points-based rewards system (configurable earn/redeem rates)
-- [ ] Digital loyalty cards
-- [ ] Tier system (Bronze, Silver, Gold, Platinum)
-- [ ] Points redemption at checkout
-- [ ] Loyalty dashboard for clients
+### Frontend Routes
+```
+/                           Dashboard
+/calendar                   Calendar (week/list/kanban views)
+/appointments/new           Create appointment (full page)
+/appointments/:id           View appointment detail
+/appointments/:id/edit      Edit appointment
 
-#### 5.2 Marketing Tools
-- [ ] Email newsletter builder (drag-and-drop, trilingual)
-- [ ] Client segmentation (filters: last visit, service type, spend)
-- [ ] Rebook reminders (automated after X days)
-- [ ] Last-minute discount slots (fill empty calendar gaps)
-- [ ] Dynamic pricing (off-peak/premium hours)
-- [ ] Discount codes (percentage / fixed amount)
-- [ ] Waiting list (per service/date)
+/clients                    Client list
+/clients/new                Create client (full page)
+/clients/:id                Client detail (info + history + notes)
+/clients/:id/edit           Edit client
 
-#### 5.3 Reviews & Reputation
-- [ ] Post-visit feedback collection (1-5 stars + comment)
-- [ ] Review widget for website embedding
-- [ ] Google Reviews integration (push satisfied clients)
-- [ ] Review response from dashboard
+/services                   Service list (grouped by category)
+/services/new               Create service (full page)
+/services/:id               Service detail
+/services/:id/edit          Edit service
 
----
+/employees                  Employee/freelancer list
+/employees/new              Add employee
+/employees/:id              Employee profile (schedule + reviews)
+/employees/:id/edit         Edit employee
 
-### Phase 6 — Reporting & Analytics (Sprint 11-12)
+/invoices                   Invoice list
+/invoices/:id               Invoice detail
 
-#### 6.1 Business Reports
-- [ ] Revenue dashboard (daily/weekly/monthly/yearly)
-- [ ] Period-to-period comparison
-- [ ] Revenue by service, employee, location
-- [ ] Occupancy rate (booked hours vs available hours)
-- [ ] No-show & cancellation rates
-- [ ] New vs returning client ratio
-- [ ] Daily email summary report
+/reviews                    Review management
 
-#### 6.2 Employee Reports
-- [ ] Revenue per employee
-- [ ] Services performed per employee
-- [ ] Product sales per employee
-- [ ] Client retention per employee
-- [ ] Working hours & utilization
+/settings                   General settings
+/integrations               Integration marketplace
+/ai                         AI Assistant
 
-#### 6.3 Client Analytics
-- [ ] Client lifetime value (CLV)
-- [ ] Visit frequency analysis
-- [ ] Service preferences
-- [ ] Churn risk detection
-- [ ] Acquisition source tracking
+/booking/:locationId        Public booking (no auth)
+/login                      Login
+/register                   Register
+```
 
----
-
-### Phase 7 — Clinic-Specific Features (Sprint 13-14)
-
-> Differentiators beyond Salonized — specific to skin clinics
-
-#### 7.1 Treatment Plans
-- [ ] Multi-session treatment plans (e.g., 6x laser, 4x peel)
-- [ ] Treatment progress tracking with photos
-- [ ] Automatic next-session scheduling
-- [ ] Treatment plan pricing (package deals)
-- [ ] Medical contraindication warnings
-
-#### 7.2 Skin Analysis
-- [ ] Skin type assessment forms
-- [ ] Product recommendation engine based on skin profile
-- [ ] Before/after comparison viewer (side-by-side)
-- [ ] Treatment outcome tracking
-
-#### 7.3 Compliance (Skin Clinic)
-- [ ] Medical disclaimer management
-- [ ] Informed consent per treatment type
-- [ ] Patch test tracking & reminders
-- [ ] Incident reporting
-
----
-
-## API Structure
-
+### API Routes (64+)
 ```
 /api/v1/
-├── auth/                    # Login, register, 2FA, password reset
-├── users/                   # Staff management
-├── locations/               # Multi-location management
-├── services/                # Service catalog
-├── appointments/            # Calendar & bookings
-├── clients/                 # CRM
-├── forms/                   # Digital forms & consents
-├── pos/                     # Point of sale & transactions
-├── inventory/               # Products & stock
-│   ├── products/
-│   ├── suppliers/
-│   └── orders/
-├── vouchers/                # Gift cards & prepaid
-├── loyalty/                 # Points & rewards
-├── marketing/               # Campaigns, newsletters, discounts
-│   ├── campaigns/
-│   ├── segments/
-│   └── discounts/
-├── reviews/                 # Feedback & reviews
-├── reports/                 # Analytics & exports
-├── treatments/              # Treatment plans (clinic-specific)
-├── search/                  # Typesense search
-├── booking/                 # Public booking widget API
-└── webhooks/                # Mollie, Google Calendar, etc.
+├── auth/                    login, register, logout, me
+├── dashboard
+├── locations/               CRUD
+│   └── {location}/
+│       ├── services/        CRUD
+│       ├── clients/         CRUD
+│       │   └── {client}/notes/  CRUD
+│       ├── appointments/    CRUD + transition
+│       └── invoices/        CRUD + send + mark-paid
+├── service-categories/      CRUD (with nested services)
+├── employees/               list, show, availability
+│   └── {employee}/working-hours/  CRUD
+├── reviews/                 CRUD + publish/unpublish
+├── integrations/            CRUD + test + sync
+├── booking/{location}/      public: services, availability, book
+└── search/                  Typesense (future)
 ```
 
-## Frontend Structure
+---
 
-```
-src/
-├── components/              # Shared UI components
-├── layouts/                 # App shell, sidebar, public
-├── pages/
-│   ├── auth/
-│   ├── dashboard/
-│   ├── calendar/
-│   ├── clients/
-│   ├── services/
-│   ├── pos/
-│   ├── inventory/
-│   ├── marketing/
-│   ├── reports/
-│   ├── treatments/
-│   └── settings/
-├── features/                # Feature-specific logic
-├── hooks/
-├── services/                # API clients
-├── i18n/
-│   ├── nl/                  # Nederlands
-│   ├── en/                  # English
-│   └── ru/                  # Русский
-├── types/
-└── stores/                  # Zustand state
-```
+## Feature Status
 
-## Database Key Models
+### Phase 1 — Foundation ✅
+- [x] Sanctum auth (login, register, logout, me)
+- [x] RBAC: Owner, Manager, Employee, Receptionist
+- [x] Multi-location support
+- [x] i18n: NL, EN, RU with react-i18next
+- [x] User activity audit log (Spatie Activitylog)
 
-```
-users, locations, user_locations (pivot)
-services, service_categories, rooms, equipment
-appointments, recurring_rules, appointment_services
-clients, client_notes, client_photos, client_tags
-forms, form_fields, form_submissions
-transactions, transaction_items, invoices
-products, product_categories, suppliers, stock_movements
-vouchers, prepaid_cards
-loyalty_points, loyalty_tiers, loyalty_redemptions
-campaigns, segments, discount_codes
-reviews, review_responses
-treatment_plans, treatment_sessions, treatment_photos
-```
+### Phase 2 — Core Scheduling ✅
+- [x] Service catalog (10 services, 3 categories, trilingual)
+- [x] Online calendar (week view)
+- [x] Appointment CRUD with status machine
+- [x] Online booking widget (4-step public wizard)
+- [ ] Calendar list view
+- [ ] Calendar kanban view
+- [ ] SlidePanel for quick appointment edits
+
+### Phase 3 — Client Management ✅
+- [x] Client CRUD with search
+- [x] Client notes (add/delete, private flag)
+- [x] Visit history on client detail
+- [ ] Client edit page (full CRUD)
+- [ ] Client reviews tab
+
+### Phase 4 — Invoicing & Integrations ✅
+- [x] Moneybird integration (contacts, products, invoices)
+- [x] Integration marketplace UI (Moneybird, Mollie, Google Cal, Mailchimp)
+- [x] Invoice from appointment
+- [x] Invoice management (send, mark paid)
+- [ ] Automatic invoice on appointment completion
+
+### Phase 5 — Employee & Freelancer Management 🚧
+- [ ] Employee list page with profiles
+- [ ] Staff vs freelancer types
+- [ ] Freelancer availability self-service
+- [ ] Working hours CRUD (connected to API)
+- [ ] Employee performance dashboard
+- [ ] Commission tracking for freelancers
+
+### Phase 6 — Reviews & Reputation 🚧
+- [ ] Review model + API
+- [ ] Post-appointment review request
+- [ ] Review display on employee profiles
+- [ ] Review widget on booking page
+- [ ] Average rating on employee cards
+
+### Phase 7 — UX Refactor 🚧
+- [ ] SlidePanel component (replace all modals for CRUD)
+- [ ] Full CRUD pages (create/edit/view) for all entities
+- [ ] Calendar: list view + kanban view
+- [ ] ConfirmDialog for destructive actions only
+- [ ] Fix all broken form submissions
+
+### Future Phases
+- [ ] Marketing & loyalty (newsletters, points, discount codes)
+- [ ] Reporting & analytics (revenue, employee performance)
+- [ ] Treatment plans (multi-session, skin clinic specific)
+- [ ] AI features (smart scheduling, client insights, auto-notes)
+- [ ] SMS/email reminders
+- [ ] Google Calendar sync
+
+---
 
 ## Development Workflow
 
 1. **Plan** — Feature spec + API design
 2. **Verify** — Review with stakeholder
 3. **Act** — Implement (API → Frontend → i18n)
-4. **Test** — Pest tests per user story
-5. **Release** — Deploy to `bosk-crm` LXC (172.24.0.30)
-
-## Quick Start
-
-```bash
-# SSH into container
-ssh root@172.24.0.30
-
-# Stack install (to be automated)
-# PHP 8.4, PostgreSQL 16, Redis 7, Typesense, Nginx, Node 22
-```
+4. **Test** — Full CRUD test per feature
+5. **Release** — Build, deploy to LXC 300 (172.24.0.30)

@@ -87,6 +87,8 @@ export interface Appointment {
   status: 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
   notes: string | null;
   price_cents: number;
+  cancelled_at: string | null;
+  cancellation_reason: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -98,8 +100,11 @@ export interface Employee {
   name: string;
   email: string;
   phone: string | null;
+  type: 'staff' | 'freelancer';
   avatar_url: string | null;
   is_active: boolean;
+  reviews_count?: number;
+  reviews_avg_rating?: number | null;
   working_hours?: WorkingHour[];
   created_at: string;
   updated_at: string;
@@ -107,11 +112,27 @@ export interface Employee {
 
 export interface WorkingHour {
   id: number;
-  employee_id: number;
+  user_id: number;
+  location_id: number;
   day_of_week: number;
   start_time: string;
   end_time: string;
   is_available: boolean;
+}
+
+export interface Review {
+  id: number;
+  location_id: number;
+  client_id: number;
+  client?: Client;
+  appointment_id: number | null;
+  employee_user_id: number;
+  employee?: User;
+  rating: number;
+  comment: string | null;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DashboardStatsDay {

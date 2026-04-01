@@ -1,62 +1,28 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useNavigate } from '@tanstack/react-router';
 import { Plus, Pencil, Trash2, Clock, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Modal } from '../../components/ui/Modal';
-import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
 import { Badge } from '../../components/ui/Badge';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import {
   useServiceCategories,
-  useCreateService,
-  useUpdateService,
   useDeleteService,
 } from '../../hooks/useApi';
 import { localizedName } from '../../utils/locale';
 import type { Service, ServiceCategory } from '../../types';
 
-
-const serviceSchema = z.object({
-  name_nl: z.string().min(1),
-  name_en: z.string().optional(),
-  name_ru: z.string().optional(),
-  description: z.string().optional(),
-  category_id: z.string().min(1),
-  duration_minutes: z.string().transform((v) => Number(v)).pipe(z.number().min(5)),
-  price_cents: z.string().transform((v) => Number(v)).pipe(z.number().min(0)),
-  buffer_minutes: z.string().transform((v) => Number(v)).pipe(z.number().min(0)),
-  is_active: z.string(),
-});
-
-type ServiceFormInput = z.input<typeof serviceSchema>;
-
 export function ServiceListPage() {
   const { t, i18n } = useTranslation();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingService, setEditingService] = useState<Service | null>(null);
+  const navigate = useNavigate();
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
+  const [deleteTarget, setDeleteTarget] = useState<Service | null>(null);
 
   const { data: categories = [], isLoading } = useServiceCategories();
-  const createService = useCreateService();
-  const updateService = useUpdateService();
   const deleteService = useDeleteService();
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<ServiceFormInput>({
-    resolver: zodResolver(serviceSchema) as any,
-    defaultValues: { buffer_minutes: '0', is_active: 'true' },
-  });
 
   const toggleCategory = (id: number) => {
     setExpandedCategories((prev) => {
@@ -67,54 +33,10 @@ export function ServiceListPage() {
     });
   };
 
-  const openCreateModal = () => {
-    setEditingService(null);
-    reset({ buffer_minutes: '0', is_active: 'true' });
-    setModalOpen(true);
-  };
-
-  const openEditModal = (service: Service) => {
-    setEditingService(service);
-    setValue('name_nl', service.name_nl);
-    setValue('name_en', service.name_en || '');
-    setValue('name_ru', service.name_ru || '');
-    setValue('description', service.description || '');
-    setValue('category_id', String(service.category_id));
-    setValue('duration_minutes', String(service.duration_minutes));
-    setValue('price_cents', String(service.price_cents));
-    setValue('buffer_minutes', String(service.buffer_minutes));
-    setValue('is_active', String(service.is_active));
-    setModalOpen(true);
-  };
-
-  const onSubmit = async (data: any) => {
-    const payload = {
-      name_nl: data.name_nl,
-      name_en: data.name_en || '',
-      name_ru: data.name_ru || '',
-      description: data.description || null,
-      category_id: Number(data.category_id),
-      duration_minutes: data.duration_minutes,
-      price_cents: data.price_cents,
-      buffer_minutes: data.buffer_minutes,
-      is_active: data.is_active === 'true',
-    };
-
-    if (editingService) {
-      await updateService.mutateAsync({ id: editingService.id, ...payload });
-    } else {
-      await createService.mutateAsync(payload);
-    }
-
-    setModalOpen(false);
-    reset();
-    setEditingService(null);
-  };
-
-  const handleDelete = async (id: number) => {
-    if (window.confirm(t('common.confirm') + '?')) {
-      await deleteService.mutateAsync(id);
-    }
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    await deleteService.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   const allCategories = categories as (ServiceCategory & { services?: Service[] })[];
@@ -129,7 +51,7 @@ export function ServiceListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">{t('services.title')}</h1>
-        <Button onClick={openCreateModal}>
+        <Button onClick={() => navigate({ to: '/services/new' })}>
           <Plus className="h-4 w-4" />
           {t('services.add_service')}
         </Button>
@@ -145,7 +67,7 @@ export function ServiceListPage() {
             title={t('services.no_services')}
             description={t('services.no_services_desc')}
             action={
-              <Button onClick={openCreateModal}>
+              <Button onClick={() => navigate({ to: '/services/new' })}>
                 <Plus className="h-4 w-4" />
                 {t('services.add_service')}
               </Button>
@@ -178,11 +100,16 @@ export function ServiceListPage() {
                     {(cat.services ?? []).map((service) => (
                       <div
                         key={service.id}
-                        className="flex items-center justify-between border-b border-slate-50 px-5 py-3 last:border-0"
+                        className="flex items-center justify-between border-b border-slate-50 px-5 py-3 last:border-0 cursor-pointer hover:bg-slate-50 transition-colors"
+                        onClick={() =>
+                          navigate({ to: '/services/$id', params: { id: String(service.id) } })
+                        }
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-slate-900">{localizedName(service, i18n.language)}</p>
+                            <p className="text-sm font-medium text-slate-900">
+                              {localizedName(service, i18n.language)}
+                            </p>
                             {!service.is_active && (
                               <Badge variant="cancelled">Inactive</Badge>
                             )}
@@ -201,13 +128,19 @@ export function ServiceListPage() {
                           </span>
                           <div className="flex items-center gap-1">
                             <button
-                              onClick={() => openEditModal(service)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate({ to: '/services/$id/edit', params: { id: String(service.id) } });
+                              }}
                               className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
                             <button
-                              onClick={() => handleDelete(service.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteTarget(service);
+                              }}
                               className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -224,80 +157,21 @@ export function ServiceListPage() {
         </div>
       )}
 
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={editingService ? t('common.edit') : t('services.add_service')}
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Input
-            label={`${t('services.service_name')} (NL)`}
-            error={errors.name_nl?.message}
-            {...register('name_nl')}
-          />
-          <Input
-            label={`${t('services.service_name')} (EN)`}
-            error={errors.name_en?.message}
-            {...register('name_en')}
-          />
-          <Input
-            label={`${t('services.service_name')} (RU)`}
-            error={errors.name_ru?.message}
-            {...register('name_ru')}
-          />
-          <Input
-            label={t('services.description')}
-            error={errors.description?.message}
-            {...register('description')}
-          />
-          <Select
-            label={t('services.category')}
-            options={allCategories.map((c) => ({ value: c.id, label: localizedName(c, i18n.language) }))}
-            placeholder={t('services.category')}
-            error={errors.category_id?.message}
-            {...register('category_id')}
-          />
-          <div className="grid grid-cols-3 gap-4">
-            <Input
-              label={`${t('services.duration')} (min)`}
-              type="number"
-              error={errors.duration_minutes?.message}
-              {...register('duration_minutes')}
-            />
-            <Input
-              label={`${t('services.price')} (cents)`}
-              type="number"
-              error={errors.price_cents?.message}
-              {...register('price_cents')}
-            />
-            <Input
-              label={`${t('services.buffer_time')} (min)`}
-              type="number"
-              error={errors.buffer_minutes?.message}
-              {...register('buffer_minutes')}
-            />
-          </div>
-          <Select
-            label={t('services.is_active')}
-            options={[
-              { value: 'true', label: t('common.yes') },
-              { value: 'false', label: t('common.no') },
-            ]}
-            {...register('is_active')}
-          />
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" type="button" onClick={() => setModalOpen(false)}>
-              {t('common.cancel')}
-            </Button>
-            <Button
-              type="submit"
-              loading={createService.isPending || updateService.isPending}
-            >
-              {t('common.save')}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title={t('common.confirm') || 'Confirm'}
+        message={
+          deleteTarget
+            ? `${t('services.delete_confirm') || 'Delete service'} "${localizedName(deleteTarget, i18n.language)}"?`
+            : ''
+        }
+        confirmLabel={t('common.delete') || 'Delete'}
+        cancelLabel={t('common.cancel') || 'Cancel'}
+        variant="danger"
+        loading={deleteService.isPending}
+      />
     </div>
   );
 }

@@ -14,12 +14,18 @@ class EmployeeController extends Controller
     {
         $query = User::query()
             ->whereHas('employeeProfiles')
-            ->with(['employeeProfile', 'roles']);
+            ->with(['employeeProfile', 'roles'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
 
         if ($locationId = $request->query('location_id')) {
             $query->whereHas('employeeProfiles', function ($q) use ($locationId) {
                 $q->where('location_id', $locationId);
             });
+        }
+
+        if ($type = $request->query('type')) {
+            $query->where('type', $type);
         }
 
         $employees = $query->orderBy('name')->paginate(25);

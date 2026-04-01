@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'type',
     ];
 
     protected $hidden = [
@@ -60,6 +61,11 @@ class User extends Authenticatable
     public function clientNotes(): HasMany
     {
         return $this->hasMany(ClientNote::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'employee_user_id');
     }
 
     public function getActivitylogOptions(): LogOptions

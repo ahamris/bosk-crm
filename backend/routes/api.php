@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\ServiceCategoryController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\InvoiceController;
+use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\WorkingHourController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +89,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('locations/{location}/invoices/{invoice}/send', [InvoiceController::class, 'send']);
     Route::post('locations/{location}/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid']);
     Route::post('locations/{location}/appointments/{appointment}/invoice', [InvoiceController::class, 'fromAppointment']);
+
+    // Reviews
+    Route::get('locations/{location}/reviews', [ReviewController::class, 'index']);
+    Route::post('locations/{location}/reviews', [ReviewController::class, 'store']);
+    Route::get('locations/{location}/reviews/{review}', [ReviewController::class, 'show']);
+    Route::patch('locations/{location}/reviews/{review}/toggle-publish', [ReviewController::class, 'togglePublish']);
+    Route::delete('locations/{location}/reviews/{review}', [ReviewController::class, 'destroy']);
 });
 
 // Public booking widget (no auth required)
@@ -95,4 +103,5 @@ Route::prefix('booking/{location}')->group(function () {
     Route::get('services', [BookingController::class, 'services']);
     Route::get('availability', [BookingController::class, 'availability']);
     Route::post('book', [BookingController::class, 'book']);
+    Route::get('employees/{user}/reviews', [ReviewController::class, 'employeeReviews']);
 });

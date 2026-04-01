@@ -37,8 +37,14 @@
     "title": "Agenda",
     "today": "Vandaag",
     "week": "Week",
+    "list": "Lijst",
+    "kanban": "Bord",
     "new_appointment": "Nieuwe afspraak",
-    "no_appointments": "Geen afspraken"
+    "no_appointments": "Geen afspraken",
+    "scheduled": "Gepland",
+    "confirmed": "Bevestigd",
+    "in_progress": "Bezig",
+    "completed_col": "Voltooid"
   },
   "clients": {
     "title": "Klanten",

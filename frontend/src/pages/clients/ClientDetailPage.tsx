@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from '@tanstack/react-router';
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import {
   ArrowLeft,
-  Mail,
-  Phone,
-  Cake,
-  FileText,
+  Pencil,
   Calendar,
+  FileText,
   Trash2,
   Lock,
 } from 'lucide-react';
@@ -84,10 +82,10 @@ export function ClientDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate({ to: '/clients' })}>
+        <Link to="/clients" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 transition-colors">
           <ArrowLeft className="h-4 w-4" />
-          {t('common.back')}
-        </Button>
+          {t('clients.title')}
+        </Link>
         <h1 className="text-2xl font-bold text-slate-900">
           {client.full_name ?? `${client.first_name} ${client.last_name}`}
         </h1>
@@ -106,20 +104,14 @@ export function ClientDetailPage() {
             <div className="mt-4 w-full space-y-3 text-left text-sm">
               {client.email && (
                 <div className="flex items-center gap-2 text-slate-600">
-                  <Mail className="h-4 w-4 text-slate-400" />
+                  <span className="text-slate-400 text-xs">{t('clients.email')}</span>
                   <span>{client.email}</span>
                 </div>
               )}
               {client.phone && (
                 <div className="flex items-center gap-2 text-slate-600">
-                  <Phone className="h-4 w-4 text-slate-400" />
+                  <span className="text-slate-400 text-xs">{t('clients.phone')}</span>
                   <span>{client.phone}</span>
-                </div>
-              )}
-              {client.date_of_birth && (
-                <div className="flex items-center gap-2 text-slate-600">
-                  <Cake className="h-4 w-4 text-slate-400" />
-                  <span>{format(new Date(client.date_of_birth), 'dd-MM-yyyy')}</span>
                 </div>
               )}
               <div className="flex items-center gap-2 text-slate-600">
@@ -152,6 +144,16 @@ export function ClientDetailPage() {
           <Card>
             {activeTab === 'info' && (
               <div className="space-y-4">
+                <div className="flex justify-end">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => navigate({ to: '/clients/$id/edit', params: { id } })}
+                  >
+                    <Pencil className="h-4 w-4" />
+                    {t('common.edit')}
+                  </Button>
+                </div>
                 <InfoRow label={t('clients.first_name')} value={client.first_name} />
                 <InfoRow label={t('clients.last_name')} value={client.last_name} />
                 <InfoRow label={t('clients.email')} value={client.email || '-'} />
@@ -160,6 +162,9 @@ export function ClientDetailPage() {
                   label={t('clients.date_of_birth')}
                   value={client.date_of_birth ? format(new Date(client.date_of_birth), 'dd-MM-yyyy') : '-'}
                 />
+                <InfoRow label={t('clients.gender')} value={client.gender ? t(`clients.gender_${client.gender}`) : '-'} />
+                <InfoRow label={t('clients.locale')} value={client.locale ?? '-'} />
+                <InfoRow label={t('clients.notes')} value={client.notes || '-'} />
               </div>
             )}
 

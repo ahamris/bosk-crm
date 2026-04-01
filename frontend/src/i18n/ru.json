@@ -37,8 +37,14 @@
     "title": "Календарь",
     "today": "Сегодня",
     "week": "Неделя",
+    "list": "Список",
+    "kanban": "Доска",
     "new_appointment": "Новая запись",
-    "no_appointments": "Нет записей"
+    "no_appointments": "Нет записей",
+    "scheduled": "Запланировано",
+    "confirmed": "Подтверждено",
+    "in_progress": "В процессе",
+    "completed_col": "Завершено"
   },
   "clients": {
     "title": "Клиенты",

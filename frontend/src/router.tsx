@@ -12,8 +12,13 @@ import { RegisterPage } from './pages/auth/RegisterPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { CalendarPage } from './pages/calendar/CalendarPage';
 import { ClientListPage } from './pages/clients/ClientListPage';
+import { ClientCreatePage } from './pages/clients/ClientCreatePage';
 import { ClientDetailPage } from './pages/clients/ClientDetailPage';
+import { ClientEditPage } from './pages/clients/ClientEditPage';
 import { ServiceListPage } from './pages/services/ServiceListPage';
+import { ServiceCreatePage } from './pages/services/ServiceCreatePage';
+import { ServiceDetailPage } from './pages/services/ServiceDetailPage';
+import { ServiceEditPage } from './pages/services/ServiceEditPage';
 import { SettingsPage } from './pages/settings/SettingsPage';
 import { IntegrationsPage } from './pages/settings/IntegrationsPage';
 import { InvoicesPage } from './pages/invoices/InvoicesPage';
@@ -80,16 +85,46 @@ const clientListRoute = createRoute({
   component: ClientListPage,
 });
 
+const clientCreateRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/clients/new',
+  component: ClientCreatePage,
+});
+
 const clientDetailRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/clients/$id',
   component: ClientDetailPage,
 });
 
+const clientEditRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/clients/$id/edit',
+  component: ClientEditPage,
+});
+
 const serviceListRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/services',
   component: ServiceListPage,
+});
+
+const serviceCreateRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/services/new',
+  component: ServiceCreatePage,
+});
+
+const serviceDetailRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/services/$id',
+  component: ServiceDetailPage,
+});
+
+const serviceEditRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/services/$id/edit',
+  component: ServiceEditPage,
 });
 
 const settingsRoute = createRoute({
@@ -131,7 +166,12 @@ const routeTree = rootRoute.addChildren([
     dashboardRoute,
     calendarRoute,
     clientListRoute,
+    clientCreateRoute,
     clientDetailRoute,
+    clientEditRoute,
+    serviceCreateRoute,
+    serviceDetailRoute,
+    serviceEditRoute,
     serviceListRoute,
     settingsRoute,
     integrationsRoute,
