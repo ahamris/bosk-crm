@@ -1,0 +1,131 @@
+{
+  "app_name": "BOSK CRM",
+  "nav": {
+    "dashboard": "Панель",
+    "calendar": "Календарь",
+    "clients": "Клиенты",
+    "services": "Услуги",
+    "settings": "Настройки",
+    "logout": "Выйти"
+  },
+  "auth": {
+    "login": "Войти",
+    "register": "Регистрация",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "password_confirmation": "Подтверждение пароля",
+    "name": "Имя",
+    "forgot_password": "Забыли пароль?",
+    "no_account": "Нет аккаунта?",
+    "has_account": "Уже есть аккаунт?",
+    "login_subtitle": "Войдите в свой аккаунт BOSK",
+    "register_subtitle": "Создайте новый аккаунт"
+  },
+  "dashboard": {
+    "title": "Панель",
+    "todays_appointments": "Записи на сегодня",
+    "total_clients": "Всего клиентов",
+    "revenue_today": "Доход сегодня",
+    "upcoming": "Предстоящие записи",
+    "no_appointments_today": "Нет записей на сегодня",
+    "welcome_back": "С возвращением"
+  },
+  "calendar": {
+    "title": "Календарь",
+    "today": "Сегодня",
+    "week": "Неделя",
+    "new_appointment": "Новая запись",
+    "no_appointments": "Нет записей"
+  },
+  "clients": {
+    "title": "Клиенты",
+    "add_client": "Добавить клиента",
+    "search_clients": "Поиск клиентов...",
+    "first_name": "Имя",
+    "last_name": "Фамилия",
+    "email": "Электронная почта",
+    "phone": "Телефон",
+    "date_of_birth": "Дата рождения",
+    "notes": "Заметки",
+    "total_visits": "Визиты",
+    "last_visit": "Последний визит",
+    "no_clients": "Клиентов пока нет",
+    "no_clients_desc": "Добавьте первого клиента",
+    "client_details": "Данные клиента",
+    "visit_history": "История визитов",
+    "personal_info": "Личная информация",
+    "no_visits": "Визитов пока нет"
+  },
+  "services": {
+    "title": "Услуги",
+    "add_service": "Добавить услугу",
+    "add_category": "Добавить категорию",
+    "category": "Категория",
+    "category_name": "Название категории",
+    "service_name": "Название услуги",
+    "description": "Описание",
+    "duration": "Длительность (мин)",
+    "price": "Цена",
+    "buffer_time": "Буферное время (мин)",
+    "is_active": "Активна",
+    "no_services": "Услуг пока нет",
+    "no_services_desc": "Добавьте первую услугу"
+  },
+  "appointments": {
+    "new_appointment": "Новая запись",
+    "select_client": "Выберите клиента",
+    "select_service": "Выберите услугу",
+    "select_employee": "Выберите сотрудника",
+    "date": "Дата",
+    "time": "Время",
+    "notes": "Заметки",
+    "cancel": "Отменить",
+    "reschedule": "Перенести",
+    "status": {
+      "scheduled": "Запланировано",
+      "confirmed": "Подтверждено",
+      "completed": "Завершено",
+      "cancelled": "Отменено",
+      "no_show": "Не явился"
+    }
+  },
+  "settings": {
+    "title": "Настройки",
+    "profile": "Профиль",
+    "location": "Локация",
+    "working_hours": "Рабочие часы",
+    "location_name": "Название локации",
+    "address": "Адрес",
+    "city": "Город",
+    "postal_code": "Почтовый индекс",
+    "phone": "Телефон",
+    "timezone": "Часовой пояс",
+    "currency": "Валюта",
+    "days": {
+      "monday": "Понедельник",
+      "tuesday": "Вторник",
+      "wednesday": "Среда",
+      "thursday": "Четверг",
+      "friday": "Пятница",
+      "saturday": "Суббота",
+      "sunday": "Воскресенье"
+    }
+  },
+  "common": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "search": "Поиск",
+    "loading": "Загрузка...",
+    "no_results": "Нет результатов",
+    "confirm": "Подтвердить",
+    "back": "Назад",
+    "close": "Закрыть",
+    "actions": "Действия",
+    "yes": "Да",
+    "no": "Нет",
+    "error": "Что-то пошло не так",
+    "success": "Успешно"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "app_name": "BOSK CRM",
+  "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Agenda",
+    "clients": "Klanten",
+    "services": "Diensten",
+    "settings": "Instellingen",
+    "logout": "Uitloggen"
+  },
+  "auth": {
+    "login": "Inloggen",
+    "register": "Registreren",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "password_confirmation": "Wachtwoord bevestigen",
+    "name": "Naam",
+    "forgot_password": "Wachtwoord vergeten?",
+    "no_account": "Nog geen account?",
+    "has_account": "Heb je al een account?",
+    "login_subtitle": "Log in op je BOSK account",
+    "register_subtitle": "Maak een nieuw account aan"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "todays_appointments": "Afspraken vandaag",
+    "total_clients": "Totaal klanten",
+    "revenue_today": "Omzet vandaag",
+    "upcoming": "Aankomende afspraken",
+    "no_appointments_today": "Geen afspraken vandaag",
+    "welcome_back": "Welkom terug"
+  },
+  "calendar": {
+    "title": "Agenda",
+    "today": "Vandaag",
+    "week": "Week",
+    "new_appointment": "Nieuwe afspraak",
+    "no_appointments": "Geen afspraken"
+  },
+  "clients": {
+    "title": "Klanten",
+    "add_client": "Klant toevoegen",
+    "search_clients": "Zoek klanten...",
+    "first_name": "Voornaam",
+    "last_name": "Achternaam",
+    "email": "E-mailadres",
+    "phone": "Telefoonnummer",
+    "date_of_birth": "Geboortedatum",
+    "notes": "Notities",
+    "total_visits": "Bezoeken",
+    "last_visit": "Laatste bezoek",
+    "no_clients": "Nog geen klanten",
+    "no_clients_desc": "Voeg je eerste klant toe om te beginnen",
+    "client_details": "Klantgegevens",
+    "visit_history": "Bezoekgeschiedenis",
+    "personal_info": "Persoonlijke gegevens",
+    "no_visits": "Nog geen bezoeken"
+  },
+  "services": {
+    "title": "Diensten",
+    "add_service": "Dienst toevoegen",
+    "add_category": "Categorie toevoegen",
+    "category": "Categorie",
+    "category_name": "Categorienaam",
+    "service_name": "Dienstnaam",
+    "description": "Beschrijving",
+    "duration": "Duur (min)",
+    "price": "Prijs",
+    "buffer_time": "Buffertijd (min)",
+    "is_active": "Actief",
+    "no_services": "Nog geen diensten",
+    "no_services_desc": "Voeg je eerste dienst toe om te beginnen"
+  },
+  "appointments": {
+    "new_appointment": "Nieuwe afspraak",
+    "select_client": "Selecteer klant",
+    "select_service": "Selecteer dienst",
+    "select_employee": "Selecteer medewerker",
+    "date": "Datum",
+    "time": "Tijd",
+    "notes": "Notities",
+    "cancel": "Annuleren",
+    "reschedule": "Verplaatsen",
+    "status": {
+      "scheduled": "Gepland",
+      "confirmed": "Bevestigd",
+      "completed": "Afgerond",
+      "cancelled": "Geannuleerd",
+      "no_show": "Niet verschenen"
+    }
+  },
+  "settings": {
+    "title": "Instellingen",
+    "profile": "Profiel",
+    "location": "Locatie",
+    "working_hours": "Werktijden",
+    "location_name": "Locatienaam",
+    "address": "Adres",
+    "city": "Stad",
+    "postal_code": "Postcode",
+    "phone": "Telefoonnummer",
+    "timezone": "Tijdzone",
+    "currency": "Valuta",
+    "days": {
+      "monday": "Maandag",
+      "tuesday": "Dinsdag",
+      "wednesday": "Woensdag",
+      "thursday": "Donderdag",
+      "friday": "Vrijdag",
+      "saturday": "Zaterdag",
+      "sunday": "Zondag"
+    }
+  },
+  "common": {
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "search": "Zoeken",
+    "loading": "Laden...",
+    "no_results": "Geen resultaten",
+    "confirm": "Bevestigen",
+    "back": "Terug",
+    "close": "Sluiten",
+    "actions": "Acties",
+    "yes": "Ja",
+    "no": "Nee",
+    "error": "Er is iets misgegaan",
+    "success": "Gelukt"
+  }
+}
